@@ -1,0 +1,29 @@
+{
+  "name": "@socketlabs/email",
+  "version": "1.0.0-alpha.1",
+  "description": "SocketLabs Email Delivery node.js client library",
+  "main": "./src/socketLabsClient.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/socketlabs/socketlabs-nodejs.git"
+  },
+  "keywords": [
+    "email",
+    "delivery",
+    "socketlabs",
+    "transactional"
+  ],
+  "author": "SocketLabs",
+  "contributors": [
+    "Matt Reibach <matt@socketlabs.com>",
+    "David Schrenker <david.schrenker@socketlabs.com>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/socketlabs/socketlabs-nodejs/issues"
+  },
+  "homepage": "https://github.com/socketlabs/socketlabs-nodejs#readme",
+  "dependencies": {
+    "request": "^2.88.0"
+  }
+}
