@@ -112,8 +112,8 @@ let bulkMessage = new BulkMessage();
 
 bulkMessage.textBody = "Is your favorite color still %%FavoriteColor%%?";
 bulkMessage.htmlBody = "<html>Is your favorite color still %%FavoriteColor%%?";
-bulkMessage.Subject = "Sending a Bulk Message With Merge Fields";
-bulkMessage.From.Email = "from@example.com";
+bulkMessage.subject = "Sending a Bulk Message With Merge Fields";
+bulkMessage.setFrom("from@example.com");
 
 //Use built-in classes and helper methods
 let recipient1 = new BulkRecipient("recipient1@example.com");
