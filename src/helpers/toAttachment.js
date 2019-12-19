@@ -47,14 +47,14 @@ class ToAttachment {
                     h.push(toCustomHeader.convert(element));
                 });
             }
-            return new attachment(), {
+            return new attachment({
                 name: n,
                 content: c,
                 contentType: t,
                 customHeaders: h,
                 filePath: f,
                 contentId: i
-            };
+            });
         }
         else {
             throw new Error("Invalid attachment, the attachment was not submitted in an expected format!");
