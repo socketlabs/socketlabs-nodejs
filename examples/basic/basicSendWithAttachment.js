@@ -16,7 +16,7 @@ message.to.push("recipient@example.com");
 
 var attachment = new Attachment({
     name: 'bus.png',
-    filePath: resolve("./examples/img/bus.png"),
+    filePath: resolve("../img/bus.png"),
     contentType: "image/png"
 });
 attachment.addCustomHeaders("myHeader", "myValue")
