@@ -201,8 +201,8 @@ class SendValidator {
     
     /**
      * Check if the message has a Message Body
-     * If an Api Template is specified it will override the HtmlBody, AmpBody, and/or the textBody.
-     * If no Api Template is specified the HtmlBody, AmpBody, and/or the textBody must me set
+     * If an Api Template is specified it will override the HtmlBody, and/or the textBody.
+     * If no Api Template is specified the HtmlBody, and/or the textBody must me set
      * @param  {number} apiTemplate - the api template id
      * @param  {string} htmlBody - the html body
      * @param  {string} textBody - the text body
