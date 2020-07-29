@@ -99,7 +99,7 @@ class BulkMessage{
 
     /**
      * Sets the plain text portion of the message body. 
-     * (Optional) Either textBody or HtmlBody must be used or use a ApiTemplate
+     * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate
      * @param  {string} value
      */
     setTextBody(value) {
@@ -117,7 +117,7 @@ class BulkMessage{
     
     /**
      * Sets the HTML portion of the message body. 
-     * (Optional) Either textBody or HtmlBody must be used or use a ApiTemplate
+     * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate
      * @param  {string} value
      */
     setHtmlBody(value) {
@@ -135,7 +135,7 @@ class BulkMessage{
 
     /**
      * Sets the Api Template for the message.
-     * (Optional) Either textBody or HtmlBody must be used or use a ApiTemplate
+     * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate
      * @param  {int} value
      */
     setApiTemplate(value) {
@@ -150,6 +150,25 @@ class BulkMessage{
          */
         this.apiTemplate = value;
     }
+
+    /**
+     * Sets the ampBody for the message.
+     * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate
+     * @param  {int} value
+     */
+    setAmpBody(value) {
+        if (typeof value === 'undefined' || !value) {
+          return;
+        }
+        if (typeof value !== 'string') {
+          throw new Error("Invalid ampBody, type of 'string' was expected.");
+        }
+        /**
+         * The Api Template for the message.
+         */
+        this.ampBody = value;
+    }
+
 
     /**
      * Sets the custom MailingId for the message.
@@ -389,6 +408,10 @@ class BulkMessage{
 
         if (this.apiTemplate) {
             json.apiTemplate = this.apiTemplate;
+        }
+
+        if (this.ampBody) {
+            json.ampBody = this.ampBody;
         }
 
         if (this.mailingId) {
