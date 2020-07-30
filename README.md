@@ -177,7 +177,7 @@ This example demonstrates how to use a proxy with your HTTP client.
 ### [Basic send complex example](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendComplexExample.js)
 This example demonstrates many features of the Basic Send, including adding multiple recipients, adding message and mailing id's, and adding an embedded image.
 
-### [Basic send with Amp ](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendWithAmpBodyExample.js)
+### [Basic send with Amp ](https://github.com/socketlabs/socketlabs-nodejs/blob/main/examples/basic/basicSendWithAmpBodyExample.js)
 This example demonstrates how to send a basic message with an AMP Html body.
 For more information about AMP please see [AMP Project](https://amp.dev/documentation/)
 
@@ -205,7 +205,7 @@ your recipients from a database and create a bulk mailing with merge data.
 This example demonstrates how to send a bulk message with a specified character
 set and special characters.
 
-### [Bulk send with Amp ](https://github.com/socketlabs/socketlabs-csharp/blob/master/Example%20Projects/dotNetCoreExample/Examples/Bulk/BulkSendWithAmpBody.cs)
+### [Bulk send with Amp ](https://github.com/socketlabs/socketlabs-nodejs/blob/main/examples/bulk/bulkSendWithAmpBodyExample.js)
 This example demonstrates how to send a bulk message with an AMP Html body.
 For more information about AMP please see [AMP Project](https://amp.dev/documentation/)
 
