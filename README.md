@@ -1,7 +1,7 @@
-[![SocketLabs](https://www.socketlabs.com/assets/socketlabs-logo1.png)](https://www.socketlabs.com) 
+[![SocketLabs](https://static.socketlabs.com/logos/logo-dark-326x64.png)](https://www.socketlabs.com/developers)
 # [![Twitter Follow](https://img.shields.io/twitter/follow/socketlabs.svg?style=social&label=Follow)](https://twitter.com/socketlabs) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/socketlabs/socketlabs-nodejs/blob/master/CONTRIBUTING.md)
 
-The SocketLabs Email Delivery Node.js library allows you to easily send email messages via the [SocketLabs Injection API](https://www.socketlabs.com/api-reference/injection-api/).  The library makes it easy to build and send any type of message supported by the API, from a simple message to a single recipient all the way to a complex bulk message sent to a group of recipients with unique merge data per recipient.
+The SocketLabs Email Delivery Node.js library allows you to easily send email messages via the [SocketLabs Injection API](https://www.socketlabs.com/docs/inject/).  The library makes it easy to build and send any type of message supported by the API, from a simple message to a single recipient all the way to a complex bulk message sent to a group of recipients with unique merge data per recipient.
 
 # Table of Contents
 * [Prerequisites and Installation](#prerequisites-and-installation)
@@ -18,7 +18,7 @@ The SocketLabs Email Delivery Node.js library allows you to easily send email me
 * A SocketLabs account. If you don't have one yet, you can [sign up for a free account](https://signup.socketlabs.com/step-1?plan=free) to get started.
 
 ## Installation
-For most uses we recommend installing the SocketLabs Email Delivery package via [npm](https://npmjs.org). If you already have a supported version of Node.js, 
+For most uses we recommend installing the SocketLabs Email Delivery package via [npm](https://npmjs.org). If you already have a supported version of Node.js,
 then it should have included npm automatically. To install the package to your current project, simply type the following in your terminal or command prompt:
 
 ```
@@ -30,20 +30,20 @@ Alternately, you can simply [clone this repository](https://github.com/socketlab
 <a name="getting-started"></a>
 # Getting Started
 ## Obtaining your API Key and SocketLabs ServerId number
-In order to get started, you'll need to enable the Injection API feature in the [SocketLabs Control Panel](https://cp.socketlabs.com). 
-Once logged in, navigate to your SocketLabs server's dashboard (if you only have one server on your account you'll be taken here immediately after logging in). 
-Make note of your 4 or 5 digit ServerId number, as you'll need this along with 
-your API key in order to use the Injection API. 
+In order to get started, you'll need to enable the Injection API feature in the [SocketLabs Control Panel](https://cp.socketlabs.com).
+Once logged in, navigate to your SocketLabs server's dashboard (if you only have one server on your account you'll be taken here immediately after logging in).
+Make note of your 4 or 5 digit ServerId number, as you'll need this along with
+your API key in order to use the Injection API.
 
-To enable the Injection API, click on the "For Developers" dropdown on the top-level navigation, then choose the "Configure HTTP Injection API" option. 
+To enable the Injection API, click on the "For Developers" dropdown on the top-level navigation, then choose the "Configure HTTP Injection API" option.
 Once here, you can enable the feature by choosing the "Enabled" option in the
-dropdown. Enabling the feature will also generate your API key, which you'll 
-need (along with your ServerId) to start using the API. Be sure to click the 
+dropdown. Enabling the feature will also generate your API key, which you'll
+need (along with your ServerId) to start using the API. Be sure to click the
 "Update" button to save your changes once you are finished.
 
 ## Basic Message
-A basic message is an email message like you'd send from a personal email client such as Outlook. 
-A basic message can have many recipients, including multiple To addresses, CC addresses, and even BCC addresses. 
+A basic message is an email message like you'd send from a personal email client such as Outlook.
+A basic message can have many recipients, including multiple To addresses, CC addresses, and even BCC addresses.
 You can also send a file attachment in a basic message.
 
 ```js
@@ -63,7 +63,7 @@ const message = {
 client.send(message);
 ```
 
-A basic message supports up to 50 recipients and supports several different ways to add recipients. We've also provided several helper classes 
+A basic message supports up to 50 recipients and supports several different ways to add recipients. We've also provided several helper classes
 to help you construct your message more easily:
 
 ```js
@@ -71,7 +71,7 @@ const {SocketLabsClient, BasicMessage, EmailAddress} = require('@socketlabs/emai
 
 const client = new SocketLabsClient(parseInt(process.env.SOCKETLABS_SERVER_ID), process.env.SOCKETLABS_INJECTION_API_KEY);
 
-//Instantiate the BasicMessage class to use built-in properties and helper methods. No need to set the messageType when using 
+//Instantiate the BasicMessage class to use built-in properties and helper methods. No need to set the messageType when using
 //the helper classes.
 let basicMessage = new BasicMessage();
 
@@ -99,9 +99,9 @@ client.send(message);
 ```
 
 ## Bulk Message
-A bulk message usually contains a single recipient per message 
-and is generally used to send the same content to many recipients, 
-optionally customizing the message via the use of MergeData. 
+A bulk message usually contains a single recipient per message
+and is generally used to send the same content to many recipients,
+optionally customizing the message via the use of MergeData.
 For more information about using Merge data, please see the [Injection API documentation](https://www.socketlabs.com/api-reference/injection-api/#merging).
 ```js
 const {SocketLabsClient, BulkMessage, BulkRecipient} = require('@socketlabs/email');
@@ -121,8 +121,8 @@ recipient1.addMergeData("FavoriteColor", "Green");
 bulkMessage.to.push(recipient1);
 
 //Use object literals
-const recipient2 = { 
-    emailAddress: "recipient2@example.com",  
+const recipient2 = {
+    emailAddress: "recipient2@example.com",
     friendlyName: "Recipient #2",
     mergeData: [
         { key: "FavoriteColor", value: "Orange" }
@@ -136,27 +136,27 @@ client.send(bulkMessage);
 
 <a name="managing-api-keys"></a>
 ## Managing API Keys
-For ease of demonstration, some of our examples may include the ServerId and API 
-key directly in our code sample. Generally it is not considered a good practice 
-to store sensitive information like this directly in your code. In most cases 
-we recommend the use of [Environment Variables](https://medium.freecodecamp.org/heres-how-you-can-actually-use-node-environment-variables-8fdf98f53a0a). 
+For ease of demonstration, some of our examples may include the ServerId and API
+key directly in our code sample. Generally it is not considered a good practice
+to store sensitive information like this directly in your code. In most cases
+we recommend the use of [Environment Variables](https://medium.freecodecamp.org/heres-how-you-can-actually-use-node-environment-variables-8fdf98f53a0a).
 
 
 <a name="examples-and-use-cases"></a>
 # Examples and Use Cases
-In order to demonstrate the many possible use cases for the Node.js library, we've provided 
-an assortment of code examples. These examples demonstrate many different 
-features available to the Injection API and Node.js library, including using templates 
-created in the [SocketLabs Email Designer](https://www.socketlabs.com/blog/introducing-new-email-designer/), custom email headers, sending 
-attachments, sending content that is stored in an HTML file, advanced bulk 
+In order to demonstrate the many possible use cases for the Node.js library, we've provided
+an assortment of code examples. These examples demonstrate many different
+features available to the Injection API and Node.js library, including using templates
+created in the [SocketLabs Email Designer](https://www.socketlabs.com/blog/introducing-new-email-designer/), custom email headers, sending
+attachments, sending content that is stored in an HTML file, advanced bulk
 merging, and even pulling recipients from a datasource.
 
 ### [Basic send from SocketLabs Template](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendWithApiTemplate.js)
-This example demonstrates the sending of a piece of content that was created in the 
+This example demonstrates the sending of a piece of content that was created in the
 SocketLabs Email Designer. This is also known as the [API Templates](https://www.socketlabs.com/blog/introducing-api-templates/) feature.
 
 ### [Basic send from HTML file](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendFromHtmlFile.js)
-This example demonstrates how to read in your HTML content from an HTML file 
+This example demonstrates how to read in your HTML content from an HTML file
 rather than passing in a string directly.
 
 ### [Basic send with file attachment](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendWithAttachment.js)
@@ -177,21 +177,42 @@ This example demonstrates how to use a proxy with your HTTP client.
 ### [Basic send complex example](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendComplexExample.js)
 This example demonstrates many features of the Basic Send, including adding multiple recipients, adding message and mailing id's, and adding an embedded image.
 
+### [Basic send with Amp ](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendWithAmpBodyExample.js)
+This example demonstrates how to send a basic message with an AMP Html body.
+For more information about AMP please see [AMP Project](https://amp.dev/documentation/)
+
+### [Basic send with invalid file attachment](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/invalid/basicSendWithInvalidAttachment.js)
+This example demonstrates the results of attempting to do a send with an invalid attachment.
+
+### [Basic send with invalid from address](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/invalid/basicSendWithInvalidFrom.js)
+This example demonstrates the results of attempting to do a send with an invalid from address.
+
+### [Basic send with invalid recipients](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/invalid/basicSendWithInvalidRecipients.js)
+This example demonstrates the results of attempting to do a send with invalid recipients.
+
 ### [Bulk send with multiple recipients](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/bulk/bulkSend.js)
 This example demonstrates how to send a bulk message to multiple recipients.
 
 ### [Bulk send with complex merge including attachments](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/bulk/bulkSendComplexExample.js)
-This example demonstrates many features of the `BulkMessage()`, including 
+This example demonstrates many features of the `BulkMessage()`, including
 adding multiple recipients, merge data, and adding an attachment.
 
 ### [Bulk send with recipients pulled from a datasource](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/bulk/bulkSendFromDataSourceWithMerge.js)
-This example uses a mock repository class to demonstrate how you would pull 
+This example uses a mock repository class to demonstrate how you would pull
 your recipients from a database and create a bulk mailing with merge data.
 
 ### [Bulk send with Ascii charset and special characters](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/bulk/bulkSendWithASCIICharsetMergeData.js)
-This example demonstrates how to send a bulk message with a specified character 
+This example demonstrates how to send a bulk message with a specified character
 set and special characters.
 
+### [Bulk send with Amp ](https://github.com/socketlabs/socketlabs-csharp/blob/master/Example%20Projects/dotNetCoreExample/Examples/Bulk/BulkSendWithAmpBody.cs)
+This example demonstrates how to send a bulk message with an AMP Html body.
+For more information about AMP please see [AMP Project](https://amp.dev/documentation/)
+
+<a name="version"></a>
+# Version
+* 1.1.0 - Adds Amp Html Support
+* 1.0.0 - Initial Release
 
 <a name="license"></a>
 # License
