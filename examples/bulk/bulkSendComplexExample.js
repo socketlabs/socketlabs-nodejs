@@ -1,4 +1,4 @@
-const {SocketLabsClient, EmailAddress, BulkMessage, BulkRecipient, Attachment, CustomHeader, MergeData} = require('../../src/socketlabsClient');
+const { SocketLabsClient, EmailAddress, BulkMessage, BulkRecipient, Attachment, CustomHeader, MergeData } = require('../../src/socketlabsClient');
 const exampleConfig = require('../exampleConfig');
 const resolve = require('path').resolve;
 
@@ -32,8 +32,6 @@ var html = "<html>"
     + "       </p>"
     + "       <h2>UTF-8 Characters:</h2>"
     + "       <p>✔ - Check</p>"
-    + "       <h2>Embedded Image:</h2>"
-    + "       <p><img src=\"cid:bus\" /></p>"
     + "   </body>"
     + "</html>";
 message.htmlBody = html
@@ -48,7 +46,39 @@ var text = "Sending A Complex Test Message"
     + "       Example of Merge Usage"
     + "           Our company motto is '%%Motto%%'."
     + "           Your birthday is %%Birthday%% and you are %%Age%% years old.";
-message.textBody = text; 
+message.textBody = text;
+
+var amp = "<!doctype html>"
+    + "<html amp4email>"
+    + "<head>"
+    + "  <meta charset=\"utf-8\">"
+    + "  <script async src=\"https://cdn.ampproject.org/v0.js\"></script>"
+    + "  <style amp4email-boilerplate>body{visibility:hidden}</style>"
+    + "  <style amp-custom>"
+    + "    h1 {"
+    + "      margin: 1rem;"
+    + "    }"
+    + "  </style>"
+    + "</head>"
+    + "<body>"
+    + "  <h1>This is the AMP Html Body of my message</h1>"
+    + "  <h2>Merge Data</h2>"
+    + "  <p>"
+    + "      Motto = <b>%%Motto%%</b> </br>"
+    + "      Birthday = <b>%%Birthday%%</b> </br>"
+    + "      Age = <b>%%Age%%</b> </br>"
+    + "      UpSell = <b>%%UpSell%%</b>"
+    + "  </p>"
+    + "  <h2>Example of Merge Usage</h2>"
+    + "  <p>"
+    + "      Our company motto is '<b>%%Motto%%</b>'. </br>"
+    + "      Your birthday is <b>%%Birthday%%</b> and you are <b>%%Age%%</b> years old."
+    + "  </p>"
+    + "  <h2>UTF-8 Characters:</h2>"
+    + "  <p>✔ - Check</p>"
+    + "</body>"
+    + "</html>";
+message.ampBody = amp;
 
 message.from = new EmailAddress("from@example.com");
 message.replyTo = new EmailAddress("replyto@example.com");
@@ -64,7 +94,7 @@ globalMergeData.push({ key: "Age", value: "an unknown number of" });
 message.globalMergeData = globalMergeData;
 
 // Add global merge data directly to the Array
-message.globalMergeData.push( new MergeData("Motto", "When hitting the Inbox matters!"));
+message.globalMergeData.push(new MergeData("Motto", "When hitting the Inbox matters!"));
 
 // Add global merge data  using the addGlobalMergeData function
 message.addGlobalMergeData("UpSell", "BTW:  You are eligible for discount pricing when you upgrade your service!")
@@ -83,47 +113,38 @@ message.to.push(rec1);
 // Add recipients with merge data directly to the Array
 var rec2MergeData = [];
 rec2MergeData.push(new MergeData("Birthday", "04/12/1984"));
-rec2MergeData.push(new MergeData("UpSell", "")); 
+rec2MergeData.push(new MergeData("UpSell", ""));
 rec2MergeData.push({ key: "Age", value: "34" });
 message.addToRecipient("recipient2@example.com", "Recipient #2", rec2MergeData);
 
 // Add recipients with merge data directly to the Array
-message.to.push({ 
-    emailAddress: "recipient3@example.com",  
+message.to.push({
+    emailAddress: "recipient3@example.com",
     friendlyName: "Recipient #3",
     mergeData: [
         { key: "Birthday", value: "10/30/1978" },
         { key: "UpSell", value: "" },
         { key: "Age", value: "40" },
-        ]
-    });
+    ]
+});
 
 // Add recipients using the addToRecipient function
 // The merge data for this Recipient will be populated with Global merge data
-message.addToRecipient("recipient4@example.com", "Recipient #4"); 
+message.addToRecipient("recipient4@example.com", "Recipient #4");
 
 /**
  * Adding Attachments
  */
 // Add Attachment directly to the Array
-var attachment1 = new Attachment( {
+var attachment1 = new Attachment({
     name: "bus.png",
-    filePath: resolve("./examples/img/bus.png"),
+    filePath: resolve("../img/bus.png"),
     contentType: "image/png"
 });
 message.attachments.push(attachment1);
 
-// Add Attachment using the addAttachments function
-var attachment2 = new Attachment({
-    name: "bus2",
-    filePath: resolve("./examples/img/bus.png"),
-    contentType: "image/png",
-    contentId: "bus"
-});
-message.addAttachments(attachment2)
-
 // Add Attachment a filePath {string} to the array
-message.attachments.push(resolve("./examples/html/sampleemail.html"));
+message.attachments.push(resolve("../html/sampleemail.html"));
 
 /**
  * Adding Custom Headers
@@ -131,7 +152,7 @@ message.attachments.push(resolve("./examples/html/sampleemail.html"));
 // Add Custom Headers using an Array
 var headers = [];
 headers.push(new CustomHeader("example-type", "bulk-send-complex"));
-headers.push({ name: "message-contains", value: "merge data, attachments, headers"});
+headers.push({ name: "message-contains", value: "merge data, attachments, headers" });
 message.customHeaders = headers;
 
 // Add Custom Headers directly to the Array
@@ -149,7 +170,7 @@ var client = new SocketLabsClient(exampleConfig.ServerId, exampleConfig.ApiKey);
  * Send the message
  */
 client.send(message).then(
-    (res)=>{
+    (res) => {
         console.log("Promise resolved: ")
         console.log(res)
     },

@@ -1,4 +1,4 @@
-const {SocketLabsClient, EmailAddress, BasicMessage} = require('../../src/socketlabsClient');
+const { SocketLabsClient, EmailAddress, BasicMessage } = require('../../src/socketlabsClient');
 const exampleConfig = require('../exampleConfig');
 const resolve = require('path').resolve;
 const fs = require('fs');
@@ -24,7 +24,7 @@ var client = new SocketLabsClient(exampleConfig.ServerId, exampleConfig.ApiKey);
  * Send the message
  */
 client.send(message).then(
-    (res)=>{
+    (res) => {
         console.log("Promise resolved: ")
         console.log(res)
     },
