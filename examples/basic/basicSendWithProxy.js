@@ -17,13 +17,16 @@ message.to.push("recipient@example.com");
 /**
  * Create the client
  */
-var client = new SocketLabsClient(exampleConfig.ServerId, exampleConfig.ApiKey, { 
-    optionalProxy: "http://localhost.:8888" 
+var client = new SocketLabsClient(exampleConfig.ServerId,exampleConfig.ApiKey,{ 
+    
+    optionalProxy: "http://localhost:4433", 
+    requestTimeout: 120,
 });
 
 /**
  * Send the message
  */
+client.requestTimeout = 40;
 client.send(message).then(
     (res)=>{
         console.log("Promise resolved: ")

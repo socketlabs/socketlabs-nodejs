@@ -36,11 +36,14 @@ class SocketLabsClient {
      * @param {string} apiKey - Your SocketLabs Injection API key
      * @param {string} endpointUrl - The SocketLabs Injection API endpoint Url
      * @param {string} optionalProxy - The http proxy you would like to use.
+     * @param {number} requestTimeout  - The timeout occured sending the message.
      */
-    constructor(serverId, apiKey, {
+    constructor(serverId, apiKey,{
+        
         endpointUrl = null,
         optionalProxy = null,
-    } = {}) {
+        requestTimeout = null,
+              } = {}) {
 
         /**
          * Your SocketLabs ServerId number.
@@ -52,6 +55,7 @@ class SocketLabsClient {
          */
         this.apiKey = apiKey;
 
+       
         /**
          * The SocketLabs Injection API endpoint Url
          */
@@ -60,7 +64,8 @@ class SocketLabsClient {
         /**
          * The SocketLabs Injection API endpoint Url
          */
-        this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
+        //this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
+        this.endpointUrl =   "http://localhost:4433";
         if (endpointUrl && endpointUrl !== '') {
             this.endpointUrl = endpointUrl;
         }
@@ -69,7 +74,19 @@ class SocketLabsClient {
             request.defaults({
                 'proxy': optionalProxy
             });
+
+           
         }
+
+        requestTimeout = {
+
+            get requestTimeout() {
+                  return this.requestTimeout;
+                },
+                set requestTimeout(value) {
+                    this.requestTimeout = value;
+                }
+            };
     }
 
     /**
@@ -108,7 +125,7 @@ class SocketLabsClient {
                         var postBody = {
                             serverId: this.serverId,
                             apiKey: this.apiKey,
-                            messages: [requestJson]
+                            messages: [requestJson],
                         };
 
                         request.post({
@@ -117,8 +134,10 @@ class SocketLabsClient {
                                     'User-Agent': this.userAgent
                                 },
                                 json: true,
-                                url: this.endpointUrl
-                            },
+                                timeout : this.requestTimeout * 1000,
+
+                                url: this.endpointUrl,
+                                   },
                             function (err, res, body) {
 
                                 if (err) {
@@ -140,7 +159,9 @@ class SocketLabsClient {
                                     reject(response)
                                 }
                             }
+                           
                         );
+                        
                     }
                 },
                 (errorResult) => {
@@ -149,6 +170,7 @@ class SocketLabsClient {
         });
     }
 }
+
 
 module.exports = {
     SocketLabsClient,
