@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/socketlabs/socketlabs-nodejs#readme",
   "dependencies": {
+    "http-status-codes": "^2.1.4",
     "request": "^2.88.0"
   }
 }

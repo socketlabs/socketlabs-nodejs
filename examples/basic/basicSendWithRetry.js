@@ -1,4 +1,4 @@
-const {SocketLabsClient, EmailAddress, BasicMessage} = require('../../src/socketlabsClient');
+const { SocketLabsClient, EmailAddress, BasicMessage } = require('../../src/socketlabsClient');
 const exampleConfig = require('../exampleConfig');
 
 /**
@@ -17,10 +17,11 @@ message.to.push("recipient@example.com");
 /**
  * Create the client
  */
-var client = new SocketLabsClient(exampleConfig.ServerId,exampleConfig.ApiKey,{ 
-    
-    optionalProxy: "http://localhost:4433",
-    requestTimeout: 120
+var client = new SocketLabsClient(exampleConfig.ServerId, exampleConfig.ApiKey, {
+
+    //optionalProxy: "http://localhost:4433",
+    //requestTimeout: 120,
+    numberOfRetries = 3
 });
 
 console.log(exampleConfig.ServerId);
@@ -31,7 +32,7 @@ console.log(exampleConfig.ApiKey);
  */
 client.requestTimeout = 20;
 client.send(message).then(
-    (res)=>{
+    (res) => {
         console.log("Promise resolved: ")
         console.log(res)
     },

@@ -1,4 +1,5 @@
 const request = require('request');
+var http = require('http');
 const version = require('../package.json').version;
 
 const sendValidator = require('./core/sendValidator');
@@ -10,15 +11,15 @@ const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
 
 /**
- * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes 
+ * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes
  * it easy to send messages and parse responses.
  * @example
  * var message = new BasicMessage();
- * 
+ *
  * // Build your message
- * 
+ *
  * var client = new SocketLabsClient(00000, "apiKey");
- * 
+ *
  * client.send(message).then(
  *     (res)=>{
  *         // Handle Success
@@ -38,12 +39,12 @@ class SocketLabsClient {
      * @param {string} optionalProxy - The http proxy you would like to use.
      * @param {number} requestTimeout  - The timeout occured sending the message.
      */
-    constructor(serverId, apiKey,{
-        
+    constructor(serverId, apiKey, {
+
         endpointUrl = null,
         optionalProxy = null,
-        requestTimeout = null,
-              } = {}) {
+        requestTimeout = 120,
+    } = {}) {
 
         /**
          * Your SocketLabs ServerId number.
@@ -55,7 +56,7 @@ class SocketLabsClient {
          */
         this.apiKey = apiKey;
 
-       
+
         /**
          * The SocketLabs Injection API endpoint Url
          */
@@ -64,8 +65,9 @@ class SocketLabsClient {
         /**
          * The SocketLabs Injection API endpoint Url
          */
-        //this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
-        this.endpointUrl =   "http://localhost:4433";
+        //this.endpointUrl = "http://localhost:4433";
+
+        this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
         if (endpointUrl && endpointUrl !== '') {
             this.endpointUrl = endpointUrl;
         }
@@ -74,19 +76,17 @@ class SocketLabsClient {
             request.defaults({
                 'proxy': optionalProxy
             });
-
-           
         }
 
         requestTimeout = {
 
             get requestTimeout() {
-                  return this.requestTimeout;
-                },
-                set requestTimeout(value) {
-                    this.requestTimeout = value;
-                }
-            };
+                return this.requestTimeout;
+            },
+            set requestTimeout(value) {
+                this.requestTimeout = value;
+            }
+        };
     }
 
     /**
@@ -106,14 +106,14 @@ class SocketLabsClient {
      * @param {string} [messageData.charSet] - the optional character set for your message.
      * @param {customHeaders[]} [messageData.customHeaders] - the optional list of custom message headers added to the message.
      * @param {mergeData[]} [messageData.globalMergeData] - the optional list of mergeData items that will be global across the whole message. (bulk send only)
-     * @param {string} messageData.messageType - type of message being sent 
+     * @param {string} messageData.messageType - type of message being sent
      * @returns {sendResponse} - SendResponse promise
      */
     send(messageData) {
         return new Promise((resolve, reject) => {
             var validator = new sendValidator();
-
             var result = validator.validateCredentials(this.serverId, this.apiKey);
+
             if (result.result !== sendResultEnum.Success) {
                 return reject(result);
             }
@@ -121,48 +121,58 @@ class SocketLabsClient {
             factory.generateRequest(messageData).then(
                 (requestJson) => {
                     if (requestJson) {
-
                         var postBody = {
-                            serverId: this.serverId,
                             apiKey: this.apiKey,
+                            serverId: this.serverId,
                             messages: [requestJson],
                         };
 
-                        request.post({
-                                body: postBody,
-                                headers: {
-                                    'User-Agent': this.userAgent
-                                },
-                                json: true,
-                                timeout : this.requestTimeout * 1000,
-
-                                url: this.endpointUrl,
-                                   },
-                            function (err, res, body) {
-
-                                if (err) {
-                                    result = new sendResponse({
-                                        result: sendResultEnum.UnknownError
-                                    });
-
-                                    if (typeof err === 'string') {
-                                        result.responseMessage = err;
-                                    }
-                                    reject(result);
-                                }
-
-                                var response = sendResponse.parse(res);
-
-                                if (response.result === sendResultEnum.Success) {
-                                    resolve(response);
-                                } else {
-                                    reject(response)
-                                }
-                            }
-                           
-                        );
-                        
                     }
+                    var options =
+                    {
+                        host: "127.0.0.1",
+                        path: this.endpointUrl,
+                        method: "POST",
+                        port: 4433,
+                        headers: {
+                            'User-Agent': this.userAgent
+                        },
+                        body: postBody,
+                        timeout: 20000,
+                        json: true,
+                    }
+
+                    http.request(options,
+                        function (err, res, body) {
+
+                            if (err) {
+                                result = new sendResponse({
+                                    result: sendResultEnum.UnknownError
+                                });
+
+                                if (typeof err === 'string') {
+                                    result.responseMessage = err;
+                                }
+                                reject(result);
+                            }
+                            socket.setTimeout(20000);
+
+                            console.log("response body is", body);
+                            var response = sendResponse.parse(res);
+                            // console.log("response msg", response);
+                            if (response.result === sendResultEnum.Success) {
+                                resolve(response);
+                            } else {
+                                reject(response)
+                            }
+                        }
+
+                    ).on("socket", function (socket) {
+                        socket.setTimeout(20000);
+                        //this.requestTimeout = 20000;
+                    });
+
+
                 },
                 (errorResult) => {
                     reject(errorResult);
