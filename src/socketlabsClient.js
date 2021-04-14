@@ -10,15 +10,15 @@ const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
 
 /**
- * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes 
+ * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes
  * it easy to send messages and parse responses.
  * @example
  * var message = new BasicMessage();
- * 
+ *
  * // Build your message
- * 
+ *
  * var client = new SocketLabsClient(00000, "apiKey");
- * 
+ *
  * client.send(message).then(
  *     (res)=>{
  *         // Handle Success
@@ -36,14 +36,14 @@ class SocketLabsClient {
      * @param {string} apiKey - Your SocketLabs Injection API key
      * @param {string} endpointUrl - The SocketLabs Injection API endpoint Url
      * @param {string} optionalProxy - The http proxy you would like to use.
-     * @param {number} requestTimeout  - The timeout occured sending the message.
+     * @param {number} requestTimeout  - the timeout period for the Injection API request (in Seconds). Default: 120s
      */
-    constructor(serverId, apiKey,{
-        
+    constructor(serverId, apiKey, {
+
         endpointUrl = null,
         optionalProxy = null,
         requestTimeout = null,
-              } = {}) {
+    } = {}) {
 
         /**
          * Your SocketLabs ServerId number.
@@ -55,17 +55,16 @@ class SocketLabsClient {
          */
         this.apiKey = apiKey;
 
-       
         /**
-         * The SocketLabs Injection API endpoint Url
+         * The SocketLabs Injection API user agent
          */
         this.userAgent = `SocketLabs-node/${version} (nodejs ${process.version})`;
 
         /**
          * The SocketLabs Injection API endpoint Url
          */
-        //this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
-        this.endpointUrl =   "http://localhost:4433";
+        this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
+
         if (endpointUrl && endpointUrl !== '') {
             this.endpointUrl = endpointUrl;
         }
@@ -74,19 +73,17 @@ class SocketLabsClient {
             request.defaults({
                 'proxy': optionalProxy
             });
-
-           
         }
 
-        requestTimeout = {
+        /**
+         * A timeout period for the Injection API request (in Seconds). Default: 120s
+         */
+        this.requestTimeout = 120;
 
-            get requestTimeout() {
-                  return this.requestTimeout;
-                },
-                set requestTimeout(value) {
-                    this.requestTimeout = value;
-                }
-            };
+        if (requestTimeout && requestTimeout !== '') {
+            this.requestTimeout = requestTimeout
+        }
+
     }
 
     /**
@@ -106,7 +103,7 @@ class SocketLabsClient {
      * @param {string} [messageData.charSet] - the optional character set for your message.
      * @param {customHeaders[]} [messageData.customHeaders] - the optional list of custom message headers added to the message.
      * @param {mergeData[]} [messageData.globalMergeData] - the optional list of mergeData items that will be global across the whole message. (bulk send only)
-     * @param {string} messageData.messageType - type of message being sent 
+     * @param {string} messageData.messageType - type of message being sent
      * @returns {sendResponse} - SendResponse promise
      */
     send(messageData) {
@@ -129,15 +126,15 @@ class SocketLabsClient {
                         };
 
                         request.post({
-                                body: postBody,
-                                headers: {
-                                    'User-Agent': this.userAgent
-                                },
-                                json: true,
-                                timeout : this.requestTimeout * 1000,
+                            body: postBody,
+                            headers: {
+                                'User-Agent': this.userAgent
+                            },
+                            json: true,
+                            timeout: this.requestTimeout * 1000,
 
-                                url: this.endpointUrl,
-                                   },
+                            url: this.endpointUrl,
+                        },
                             function (err, res, body) {
 
                                 if (err) {
@@ -159,9 +156,9 @@ class SocketLabsClient {
                                     reject(response)
                                 }
                             }
-                           
+
                         );
-                        
+
                     }
                 },
                 (errorResult) => {
