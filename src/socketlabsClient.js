@@ -37,13 +37,13 @@ class SocketLabsClient {
      * @param {string} apiKey - Your SocketLabs Injection API key
      * @param {string} endpointUrl - The SocketLabs Injection API endpoint Url
      * @param {string} optionalProxy - The http proxy you would like to use.
-     * @param {number} requestTimeout  - The timeout occured sending the message.
+     * @param {number} requestTimeout  - the timeout period for the Injection API request (in Seconds). Default: 120s
      */
     constructor(serverId, apiKey, {
 
         endpointUrl = null,
         optionalProxy = null,
-        requestTimeout = 120,
+        requestTimeout = null,
     } = {}) {
 
         /**
@@ -56,18 +56,16 @@ class SocketLabsClient {
          */
         this.apiKey = apiKey;
 
-
         /**
-         * The SocketLabs Injection API endpoint Url
+         * The SocketLabs Injection API user agent
          */
         this.userAgent = `SocketLabs-node/${version} (nodejs ${process.version})`;
 
         /**
          * The SocketLabs Injection API endpoint Url
          */
-        //this.endpointUrl = "http://localhost:4433";
-
         this.endpointUrl = "https://inject.socketlabs.com/api/v1/email";
+
         if (endpointUrl && endpointUrl !== '') {
             this.endpointUrl = endpointUrl;
         }
@@ -78,15 +76,15 @@ class SocketLabsClient {
             });
         }
 
-        requestTimeout = {
+        /**
+         * A timeout period for the Injection API request (in Seconds). Default: 120s
+         */
+        this.requestTimeout = 120;
 
-            get requestTimeout() {
-                return this.requestTimeout;
-            },
-            set requestTimeout(value) {
-                this.requestTimeout = value;
-            }
-        };
+        if (requestTimeout && requestTimeout !== '') {
+            this.requestTimeout = requestTimeout
+        }
+
     }
 
     /**
@@ -127,23 +125,28 @@ class SocketLabsClient {
                             messages: [requestJson],
                         };
 
-                    }
-                    var options =
-                    {
-                        host: "127.0.0.1",
-                        path: this.endpointUrl,
-                        method: "POST",
-                        port: 4433,
-                        headers: {
-                            'User-Agent': this.userAgent
-                        },
-                        body: postBody,
-                        timeout: 20000,
-                        json: true,
-                    }
+                        request.post({
+                            body: postBody,
+                            headers: {
+                                'User-Agent': this.userAgent
+                            },
+                            json: true,
+                            timeout: this.requestTimeout * 1000,
 
-                    http.request(options,
-                        function (err, res, body) {
+                            url: this.endpointUrl,
+                        },
+                            function (err, res, body) {
+
+                                if (err) {
+                                    result = new sendResponse({
+                                        result: sendResultEnum.UnknownError
+                                    });
+
+                                    if (typeof err === 'string') {
+                                        result.responseMessage = err;
+                                    }
+                                    reject(result);
+                                }
 
                             if (err) {
                                 result = new sendResponse({
@@ -155,24 +158,10 @@ class SocketLabsClient {
                                 }
                                 reject(result);
                             }
-                            socket.setTimeout(20000);
 
-                            console.log("response body is", body);
-                            var response = sendResponse.parse(res);
-                            // console.log("response msg", response);
-                            if (response.result === sendResultEnum.Success) {
-                                resolve(response);
-                            } else {
-                                reject(response)
-                            }
-                        }
+                        );
 
-                    ).on("socket", function (socket) {
-                        socket.setTimeout(20000);
-                        //this.requestTimeout = 20000;
-                    });
-
-
+                    }
                 },
                 (errorResult) => {
                     reject(errorResult);
