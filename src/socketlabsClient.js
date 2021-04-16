@@ -1,12 +1,11 @@
-const request = require('request');
-var http = require('http');
-const version = require('../package.json').version;
+const axios = require('axios');
+const http = require('http');
+const https = require('https');
 
+const version = require('../package.json').version;
 const sendValidator = require('./core/sendValidator');
 const factory = require('./core/injectionRequestFactory');
-
 const { Attachment, BasicMessage, BulkMessage, BulkRecipient, CustomHeader, EmailAddress, MergeData } = require('./message/messageClasses');
-
 const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
 
@@ -71,9 +70,7 @@ class SocketLabsClient {
         }
 
         if (optionalProxy && typeof optionalProxy === 'string') {
-            request.defaults({
-                'proxy': optionalProxy
-            });
+            this.proxy = optionalProxy;
         }
 
         /**
@@ -85,6 +82,43 @@ class SocketLabsClient {
             this.requestTimeout = requestTimeout
         }
 
+    }
+
+    createRequest(requestJson) {
+
+        let request = {
+            url: this.endpointUrl,
+            method: "POST",
+            data: {
+                apiKey: this.apiKey,
+                serverId: this.serverId,
+                messages: [requestJson],
+            },
+            headers: { 'User-Agent': this.userAgent },
+            timeout: this.requestTimeout * 1000,
+
+        };
+
+        if (this.proxy) {
+            let proxyUrl = new URL(this.proxy);
+            if (proxyUrl.port == 443) {
+                request.httpAgent = new http.Agent({
+                    host: proxyUrl.hostname,
+                    port: proxyUrl.port
+                });
+            }
+            else {
+                request.httpsAgent = new https.Agent({
+                    host: proxyUrl.hostname,
+                    port: proxyUrl.port
+                });
+            };
+
+        }
+
+        console.log(request);
+
+        return request;
     }
 
     /**
@@ -109,9 +143,9 @@ class SocketLabsClient {
      */
     send(messageData) {
         return new Promise((resolve, reject) => {
+
             var validator = new sendValidator();
             var result = validator.validateCredentials(this.serverId, this.apiKey);
-
             if (result.result !== sendResultEnum.Success) {
                 return reject(result);
             }
@@ -119,47 +153,23 @@ class SocketLabsClient {
             factory.generateRequest(messageData).then(
                 (requestJson) => {
                     if (requestJson) {
-                        var postBody = {
-                            apiKey: this.apiKey,
-                            serverId: this.serverId,
-                            messages: [requestJson],
-                        };
 
-                        request.post({
-                            body: postBody,
-                            headers: {
-                                'User-Agent': this.userAgent
-                            },
-                            json: true,
-                            timeout: this.requestTimeout * 1000,
+                        let request = this.createRequest(requestJson);
 
-                            url: this.endpointUrl,
-                        },
-                            function (err, res, body) {
-
-                                if (err) {
-                                    result = new sendResponse({
-                                        result: sendResultEnum.UnknownError
-                                    });
-
-                                    if (typeof err === 'string') {
-                                        result.responseMessage = err;
-                                    }
-                                    reject(result);
+                        axios(request)
+                            .then((response) => {
+                                var response = sendResponse.parse(response);
+                                if (response.result === sendResultEnum.Success) {
+                                    resolve(response);
+                                } else {
+                                    reject(response)
                                 }
 
-                            if (err) {
-                                result = new sendResponse({
-                                    result: sendResultEnum.UnknownError
-                                });
-
-                                if (typeof err === 'string') {
-                                    result.responseMessage = err;
-                                }
+                            }, (error) => {
+                                result = new sendResponse({ result: sendResultEnum.UnknownError });
+                                if (typeof error === 'string') result.responseMessage = error;
                                 reject(result);
-                            }
-
-                        );
+                            });
 
                     }
                 },
