@@ -20,7 +20,6 @@ class SendResponse {
         transactionReceipt = null,
         addressResults = null,
         responseMessage = null,
-        // endpointUrl =null,
     } = {}) {
 
         this.transactionReceipt = null;
@@ -126,18 +125,6 @@ class SendResponse {
         this.responseMessage = value;
     }
 
-    // ValidateEndpoint(url)
-    // {
-    //   if(this.endpointUrl === url)
-    //   { this.responseMessage = null;
-    //     value = this.responseMessage
-    //       return value;
-    //       console.log(value);
-    //   }
-    // }
-
-
-
     toString() {
         return `${this.sendResult}: ${this.responseMessage}`;
     }
@@ -149,21 +136,19 @@ class SendResponse {
      */
 
     static parse(value) {
-        console.log(value);
-        console.log(value.statusCode);
-        var body = value.body ?? new Object;
-        console.log(body);
-        var response = value.body ? { transactionReceipt: body.TransactionReceipt } : new SendResponse();
-        console.log(response);
-        switch (value.statusCode) {
-            case 200: //HttpStatusCode.OK
 
-                var r = sendResultEnum[body.ErrorCode];
-                if (r === undefined) {
-                    response.setResult(sendResultEnum.UnknownError);
+        var body = value && value.data ? value.data : null;
+        var response = body ? new SendResponse({ transactionReceipt: body.TransactionReceipt }) : new SendResponse();
+
+        switch (value.status) {
+            case 200: //HttpStatusCode.OK
+                response.setResult(sendResultEnum[body.ErrorCode]);
+                if (response.result == sendResultEnum.Warning && (body.MessageResults && body.MessageResults.length > 0)) {
+                    var r = sendResultEnum[body.MessageResults[0].ErrorCode];
+                    if (r !== undefined) response.setResult(r);
                 }
-                else {
-                    response.setResult(r);
+                if (body.MessageResults && body.MessageResults.length > 0) {
+                    response.setAddressResults(body.MessageResults[0].AddressResults);
                 }
                 break;
 
@@ -174,27 +159,14 @@ class SendResponse {
             case 408: //HttpStatusCode.RequestTimeout
                 response.setResult(sendResultEnum.Timeout);
                 return response;
-            //break;
 
             case 401: //HttpStatusCode.Unauthorized
                 response.setResult(sendResultEnum.InvalidAuthentication);
                 break;
 
             default:
-                response.transactionReceipt = body.transactionReceipt;
                 response.setResult(sendResultEnum.UnknownError);
                 break;
-        }
-
-        if (response.result == sendResultEnum.Warning && (body.MessageResults && body.MessageResults.length > 0)) {
-            var r = sendResultEnum[body.MessageResults[0].ErrorCode];
-            if (r !== undefined) {
-                response.setResult(r);
-            }
-        }
-
-        if (body.MessageResults && body.MessageResults.length > 0) {
-            response.setAddressResults(body.MessageResults[0].AddressResults);
         }
 
         return response;
