@@ -17,15 +17,12 @@ message.to.push("recipient@example.com");
 /**
  * Create the client
  */
-var client = new SocketLabsClient(exampleConfig.ServerId, exampleConfig.ApiKey, {
+var client = new SocketLabsClient(exampleConfig.ServerId, exampleConfig.ApiKey,
+    {
+        optionalProxy: "http://localhost:4433"
+    });
 
-    //optionalProxy: "http://localhost:4433",
-    //requestTimeout: 120,
-    numberOfRetries = 3
-});
-
-console.log(exampleConfig.ServerId);
-console.log(exampleConfig.ApiKey);
+client.numberOfRetries = 3;
 
 /**
  * Send the message

@@ -1,4 +1,3 @@
-const axios = require('axios');
 const http = require('http');
 const https = require('https');
 
@@ -8,6 +7,7 @@ const factory = require('./core/injectionRequestFactory');
 const { Attachment, BasicMessage, BulkMessage, BulkRecipient, CustomHeader, EmailAddress, MergeData } = require('./message/messageClasses');
 const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
+const retryHandler = require('./core/retryHandler');
 
 /**
  * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes
@@ -36,13 +36,14 @@ class SocketLabsClient {
      * @param {string} apiKey - Your SocketLabs Injection API key
      * @param {string} endpointUrl - The SocketLabs Injection API endpoint Url
      * @param {string} optionalProxy - The http proxy you would like to use.
-     * @param {number} requestTimeout  - the timeout period for the Injection API request (in Seconds). Default: 120s
+     * @param {number} requestTimeout  - The timeout period for the Injection API request (in Seconds). Default: 120s
+     * @param {number} numberOfRetries  - The number of times to retry the Injection API request. Default: 0
      */
     constructor(serverId, apiKey, {
-
         endpointUrl = null,
         optionalProxy = null,
         requestTimeout = null,
+        numberOfRetries = null,
     } = {}) {
 
         /**
@@ -69,6 +70,9 @@ class SocketLabsClient {
             this.endpointUrl = endpointUrl;
         }
 
+        /**
+         * The http proxy you would like to use.
+         */
         if (optionalProxy && typeof optionalProxy === 'string') {
             this.proxy = optionalProxy;
         }
@@ -80,6 +84,15 @@ class SocketLabsClient {
 
         if (requestTimeout && requestTimeout !== '') {
             this.requestTimeout = requestTimeout
+        }
+
+        /**
+         * The number of times to retry the Injection API request. Default: 0
+         */
+        this.numberOfRetries = 0;
+
+        if (numberOfRetries && numberOfRetries !== '') {
+            this.numberOfRetries = numberOfRetries
         }
 
     }
@@ -115,8 +128,6 @@ class SocketLabsClient {
             };
 
         }
-
-        console.log(request);
 
         return request;
     }
@@ -155,8 +166,9 @@ class SocketLabsClient {
                     if (requestJson) {
 
                         let request = this.createRequest(requestJson);
+                        let retry = new retryHandler(this.numberOfRetries)
 
-                        axios(request)
+                        retry.send(request)
                             .then((response) => {
                                 var response = sendResponse.parse(response);
                                 if (response.result === sendResultEnum.Success) {
@@ -166,10 +178,16 @@ class SocketLabsClient {
                                 }
 
                             }, (error) => {
-                                result = new sendResponse({ result: sendResultEnum.UnknownError });
+                                let statusCode = (error.code) ? error.code : (error.status) ? error.status : error.response.status;
+                                let result = new sendResponse({ result: sendResultEnum[statusCode] });
+                                if (statusCode == "ECONNABORTED") {
+                                    result = new sendResponse({ result: sendResultEnum.Timeout });
+                                }
+
                                 if (typeof error === 'string') result.responseMessage = error;
                                 reject(result);
-                            });
+                            })
+                            .catch((error) => { reject(error) });
 
                     }
                 },
@@ -178,6 +196,7 @@ class SocketLabsClient {
                 });
         });
     }
+
 }
 
 
