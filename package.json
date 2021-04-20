@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/socketlabs/socketlabs-nodejs#readme",
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "promise-retry": "^2.0.1"
   }
 }
