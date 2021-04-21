@@ -176,14 +176,12 @@ class SocketLabsClient {
                                 } else {
                                     reject(response)
                                 }
-
                             }, (error) => {
                                 let statusCode = (error.code) ? error.code : (error.status) ? error.status : error.response.status;
                                 let result = new sendResponse({ result: sendResultEnum[statusCode] });
                                 if (statusCode == "ECONNABORTED") {
                                     result = new sendResponse({ result: sendResultEnum.Timeout });
                                 }
-
                                 if (typeof error === 'string') result.responseMessage = error;
                                 reject(result);
                             })
