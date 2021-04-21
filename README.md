@@ -174,6 +174,9 @@ This example demonstrates how to add custom headers to your email message.
 ### [Basic send with a web proxy](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendWithProxy.js)
 This example demonstrates how to use a proxy with your HTTP client.
 
+### [Basic send with retry enabled](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendWithRetry.js)
+This example demonstrates how to use the retry logic with your HTTP client.
+
 ### [Basic send complex example](https://github.com/socketlabs/socketlabs-nodejs/blob/master/examples/basic/basicSendComplexExample.js)
 This example demonstrates many features of the Basic Send, including adding multiple recipients, adding message and mailing id's, and adding an embedded image.
 
@@ -211,6 +214,7 @@ For more information about AMP please see [AMP Project](https://amp.dev/document
 
 <a name="version"></a>
 # Version
+* 1.2.1 - Adding optional retry logic for Http requests. If configured, the request will retry when certain 500 errors occur (500, 502, 503, 504)
 * 1.1.1 - Adding request timeout value on the client for Http requests
 * 1.1.0 - Adds Amp Html Support
 * 1.0.0 - Initial Release

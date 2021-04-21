@@ -1,13 +1,13 @@
-const request = require('request');
-const version = require('../package.json').version;
+const http = require('http');
+const https = require('https');
 
+const version = require('../package.json').version;
 const sendValidator = require('./core/sendValidator');
 const factory = require('./core/injectionRequestFactory');
-
 const { Attachment, BasicMessage, BulkMessage, BulkRecipient, CustomHeader, EmailAddress, MergeData } = require('./message/messageClasses');
-
 const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
+const retryHandler = require('./core/retryHandler');
 
 /**
  * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes
@@ -36,13 +36,14 @@ class SocketLabsClient {
      * @param {string} apiKey - Your SocketLabs Injection API key
      * @param {string} endpointUrl - The SocketLabs Injection API endpoint Url
      * @param {string} optionalProxy - The http proxy you would like to use.
-     * @param {number} requestTimeout  - the timeout period for the Injection API request (in Seconds). Default: 120s
+     * @param {number} requestTimeout  - The timeout period for the Injection API request (in Seconds). Default: 120s
+     * @param {number} numberOfRetries  - The number of times to retry the Injection API request. Default: 0
      */
     constructor(serverId, apiKey, {
-
         endpointUrl = null,
         optionalProxy = null,
         requestTimeout = null,
+        numberOfRetries = null,
     } = {}) {
 
         /**
@@ -69,10 +70,11 @@ class SocketLabsClient {
             this.endpointUrl = endpointUrl;
         }
 
+        /**
+         * The http proxy you would like to use.
+         */
         if (optionalProxy && typeof optionalProxy === 'string') {
-            request.defaults({
-                'proxy': optionalProxy
-            });
+            this.proxy = optionalProxy;
         }
 
         /**
@@ -84,6 +86,50 @@ class SocketLabsClient {
             this.requestTimeout = requestTimeout
         }
 
+        /**
+         * The number of times to retry the Injection API request. Default: 0
+         */
+        this.numberOfRetries = 0;
+
+        if (numberOfRetries && numberOfRetries !== '') {
+            this.numberOfRetries = numberOfRetries
+        }
+
+    }
+
+    createRequest(requestJson) {
+
+        let request = {
+            url: this.endpointUrl,
+            method: "POST",
+            data: {
+                apiKey: this.apiKey,
+                serverId: this.serverId,
+                messages: [requestJson],
+            },
+            headers: { 'User-Agent': this.userAgent },
+            timeout: this.requestTimeout * 1000,
+
+        };
+
+        if (this.proxy) {
+            let proxyUrl = new URL(this.proxy);
+            if (proxyUrl.port == 443) {
+                request.httpAgent = new http.Agent({
+                    host: proxyUrl.hostname,
+                    port: proxyUrl.port
+                });
+            }
+            else {
+                request.httpsAgent = new https.Agent({
+                    host: proxyUrl.hostname,
+                    port: proxyUrl.port
+                });
+            };
+
+        }
+
+        return request;
     }
 
     /**
@@ -108,8 +154,8 @@ class SocketLabsClient {
      */
     send(messageData) {
         return new Promise((resolve, reject) => {
-            var validator = new sendValidator();
 
+            var validator = new sendValidator();
             var result = validator.validateCredentials(this.serverId, this.apiKey);
             if (result.result !== sendResultEnum.Success) {
                 return reject(result);
@@ -119,45 +165,27 @@ class SocketLabsClient {
                 (requestJson) => {
                     if (requestJson) {
 
-                        var postBody = {
-                            serverId: this.serverId,
-                            apiKey: this.apiKey,
-                            messages: [requestJson],
-                        };
+                        let request = this.createRequest(requestJson);
+                        let retry = new retryHandler(this.numberOfRetries)
 
-                        request.post({
-                            body: postBody,
-                            headers: {
-                                'User-Agent': this.userAgent
-                            },
-                            json: true,
-                            timeout: this.requestTimeout * 1000,
-
-                            url: this.endpointUrl,
-                        },
-                            function (err, res, body) {
-
-                                if (err) {
-                                    result = new sendResponse({
-                                        result: sendResultEnum.UnknownError
-                                    });
-
-                                    if (typeof err === 'string') {
-                                        result.responseMessage = err;
-                                    }
-                                    reject(result);
-                                }
-
-                                var response = sendResponse.parse(res);
-
+                        retry.send(request)
+                            .then((response) => {
+                                var response = sendResponse.parse(response);
                                 if (response.result === sendResultEnum.Success) {
                                     resolve(response);
                                 } else {
                                     reject(response)
                                 }
-                            }
-
-                        );
+                            }, (error) => {
+                                let statusCode = (error.code) ? error.code : (error.status) ? error.status : error.response.status;
+                                let result = new sendResponse({ result: sendResultEnum[statusCode] });
+                                if (statusCode == "ECONNABORTED") {
+                                    result = new sendResponse({ result: sendResultEnum.Timeout });
+                                }
+                                if (typeof error === 'string') result.responseMessage = error;
+                                reject(result);
+                            })
+                            .catch((error) => { reject(error) });
 
                     }
                 },
@@ -166,6 +194,7 @@ class SocketLabsClient {
                 });
         });
     }
+
 }
 
 
