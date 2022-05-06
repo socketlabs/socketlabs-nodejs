@@ -1,6 +1,6 @@
 'use strict';
 
-const {ToBulkRecipient, ToEmailAddress, ToCustomHeader} = require('../helpers/helpersClasses');
+const { ToBulkRecipient, ToEmailAddress, ToCustomHeader } = require('../helpers/helpersClasses');
 
 const sendResponse = require('../sendResponse');
 const addressResult = require('../addressResult');
@@ -12,17 +12,16 @@ const MaximumRecipientsPerMessage = 50;
  * Used by the SocketLabsClient to conduct basic validation on the message before sending to the Injection API.
  */
 class SendValidator {
-    
+
     /**
      * Validate the ServerId and Api Key pair prior before sending to the Injection API.
      * @param  {number} serverId - Your SocketLabs ServerId number.
      * @param  {string} apiKey - Your SocketLabs Injection API key.
      * @returns A SendResponse with the validation results
      */
-    validateCredentials(serverId, apiKey)
-    {
+    validateCredentials(serverId, apiKey) {
         var result = new sendResponse();
-        
+
         //String given
         if (typeof apiKey !== 'string') {
             result.setResult(sendResultEnum.AuthenticationValidationFailed);
@@ -33,9 +32,9 @@ class SendValidator {
             result.setResult(sendResultEnum.AuthenticationValidationFailed);
             return result;
         }
-        
+
         //int given
-        if (typeof serverId !== 'number') {
+        if (Number.isInteger(serverId)) {
             result.setResult(sendResultEnum.AuthenticationValidationFailed);
             return result;
         }
@@ -43,7 +42,7 @@ class SendValidator {
         if (serverId <= 0) {
             result.setResult(sendResultEnum.AuthenticationValidationFailed);
             return result;
-        } 
+        }
 
         result.setResult(sendResultEnum.Success);
         return result;
@@ -70,7 +69,7 @@ class SendValidator {
             result.setResult(sendResultEnum.EmailAddressValidationMissingFrom);
             return result;
         }
-        if (!from.isValid()){
+        if (!from.isValid()) {
             result.setResult(sendResultEnum.EmailAddressValidationInvalidFrom);
             return result;
         }
@@ -95,7 +94,7 @@ class SendValidator {
             }
         }
 
-        // Check email addresses        
+        // Check email addresses
         return this.validateEmailAddresses(message.to, message.cc, message.bcc);
 
     }
@@ -121,7 +120,7 @@ class SendValidator {
             result.setResult(sendResultEnum.EmailAddressValidationMissingFrom);
             return result;
         }
-        if (!from.isValid()){
+        if (!from.isValid()) {
             result.setResult(sendResultEnum.EmailAddressValidationInvalidFrom);
             return result;
         }
@@ -151,7 +150,7 @@ class SendValidator {
 
     }
 
-    
+
     /**
      * Check if the fromAddress is not empty
      * @param  {emailAddress} fromAddress - the from email address
@@ -161,12 +160,12 @@ class SendValidator {
         if (typeof value === 'undefined' || !value) {
             return false;
         }
-        if (value && value === '') {    
+        if (value && value === '') {
             return false;
         }
-        return true;        
+        return true;
     }
-    
+
     /**
      * Check if the fromAddress is not empty
      * @param  {emailAddress} fromAddress - the from email address
@@ -176,7 +175,7 @@ class SendValidator {
         if (typeof value === 'undefined' || !value) {
             return false;
         }
-        if (value && value.emailAddress === ''){  
+        if (value && value.emailAddress === '') {
             return false;
         }
         return true;
@@ -189,16 +188,16 @@ class SendValidator {
      */
     isValidReplyTo(value) {
         if (typeof value === 'undefined' || !value) {
-            return true; // undefined is allowed 
+            return true; // undefined is allowed
         }
         var replyTo = ToEmailAddress.convert(value);
-        if (replyTo && replyTo.emailAddress === '' && replyTo.friendlyName === ''){
+        if (replyTo && replyTo.emailAddress === '' && replyTo.friendlyName === '') {
             return true;
         }
-        return replyTo.isValid();        
+        return replyTo.isValid();
     }
 
-    
+
     /**
      * Check if the message has a Message Body
      * If an Api Template is specified it will override the HtmlBody, and/or the textBody.
@@ -209,11 +208,11 @@ class SendValidator {
      * @returns {bool} the validation result
      */
     hasMessageBody(apiTemplate, htmlBody, textBody) {
-        
+
         if ((typeof apiTemplate !== 'undefined' || apiTemplate) &&
-            (typeof apiTemplate === 'number') && 
+            (typeof apiTemplate === 'number') &&
             (apiTemplate > 0)) {
-                return true;                
+            return true;
         }
 
         return (this.hasValidString(htmlBody) || this.hasValidString(textBody));
@@ -224,10 +223,10 @@ class SendValidator {
      * @param  {customHeader[]} value - array of customHeader
      * @returns {bool} the validation result
      */
-    hasValidCustomHeaders(value) {        
+    hasValidCustomHeaders(value) {
         if (typeof value === 'undefined' || !value) {
-            return true; 
-        }           
+            return true;
+        }
         if (!Array.isArray(value)) {
             return false;
         }
@@ -238,7 +237,7 @@ class SendValidator {
             try {
                 value.forEach(element => {
                     if (!ToCustomHeader.convert(element).isValid())
-                    return false;
+                        return false;
                 });
             } catch (error) {
                 return false;
@@ -276,7 +275,7 @@ class SendValidator {
             result.addressResults = invalidRec;
             return result;
         }
-            
+
         result.setResult(sendResultEnum.Success);
         return result;
 
@@ -292,7 +291,7 @@ class SendValidator {
 
         var fullRecipientCount = 0;
         if ((typeof to !== 'undefined' || to) && (Array.isArray(to))) {
-            fullRecipientCount =  to.length;
+            fullRecipientCount = to.length;
         }
         if (fullRecipientCount <= 0) {
             result.setResult(sendResultEnum.RecipientValidationNoneInMessage);
@@ -302,14 +301,14 @@ class SendValidator {
             result.setResult(sendResultEnum.RecipientValidationMaxExceeded);
             return result;
         }
-   
+
         var invalidRec = this.hasInvalidBulkRecipients(to);
-        if (invalidRec != null && invalidRec.length > 0) {       
+        if (invalidRec != null && invalidRec.length > 0) {
             result.setResult(sendResultEnum.RecipientValidationInvalidRecipients);
             result.addressResults = invalidRec;
             return result;
         }
-            
+
         result.setResult(sendResultEnum.Success);
         return result;
     }
@@ -334,7 +333,7 @@ class SendValidator {
         if ((typeof bcc !== 'undefined' || bcc) && (Array.isArray(bcc))) {
             recipientCount += bcc.length;
         }
-        return recipientCount;        
+        return recipientCount;
     }
 
     /**
@@ -348,18 +347,18 @@ class SendValidator {
         var invalid = [];
         if ((typeof to !== 'undefined' || to) && (Array.isArray(to))) {
             this.findInvalidEmailAddresses(to).forEach(e => {
-                invalid.push(e)                   
-            });   
+                invalid.push(e)
+            });
         }
         if ((typeof cc !== 'undefined' || cc) && (Array.isArray(cc))) {
             this.findInvalidEmailAddresses(cc).forEach(e => {
-                invalid.push(e)                   
-            });   
+                invalid.push(e)
+            });
         }
         if ((typeof bcc !== 'undefined' || bcc) && (Array.isArray(bcc))) {
             this.findInvalidEmailAddresses(bcc).forEach(e => {
-                invalid.push(e)                   
-            });   
+                invalid.push(e)
+            });
         }
         return invalid;
     }
@@ -386,8 +385,7 @@ class SendValidator {
             try {
                 value.forEach(element => {
                     var e = ToEmailAddress.convert(element);
-                    if (!e.isValid())
-                    {
+                    if (!e.isValid()) {
                         invalid.push(new addressResult(
                             {
                                 accepted: false,
@@ -395,11 +393,11 @@ class SendValidator {
                                 errorCode: "InvalidAddress"
                             })
                         );
-                    }                    
+                    }
                 });
             } catch (error) {
                 return invalid;
-            } 
+            }
         }
         return invalid;
     }
@@ -415,20 +413,19 @@ class SendValidator {
             try {
                 value.forEach(element => {
                     var e = ToBulkRecipient.convert(element);
-                    if (!e.isValid())
-                    {
-                        invalid.push(new addressResult( 
+                    if (!e.isValid()) {
+                        invalid.push(new addressResult(
                             {
                                 accepted: false,
                                 emailAddress: e.emailAddress,
                                 errorCode: "InvalidAddress"
                             })
                         );
-                    }                    
+                    }
                 });
             } catch (error) {
                 return invalid;
-            } 
+            }
         }
         return invalid;
     }
