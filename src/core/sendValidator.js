@@ -34,7 +34,7 @@ class SendValidator {
         }
 
         //int given
-        if (Number.isInteger(serverId)) {
+        if (!Number.isInteger(serverId)) {
             result.setResult(sendResultEnum.AuthenticationValidationFailed);
             return result;
         }
