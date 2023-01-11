@@ -310,6 +310,14 @@ module.exports = Object.freeze(
             value: 37,
             message: "SDK Validation Error: Expected messageType of basic or bulk"
         },
+        /**
+         * SDK Validation Error: Message contains invalid metadata
+         */
+        MessageValidationInvalidMetadata: {
+            name: "MessageValidationInvalidMetadata",
+            value: 38,
+            message: "SDK Validation Error: Message contains invalid metadata"
+        },
 
         /**
   *Bad Gateway
