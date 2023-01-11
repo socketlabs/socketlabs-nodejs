@@ -4,7 +4,7 @@ const https = require('https');
 const version = require('../package.json').version;
 const sendValidator = require('./core/sendValidator');
 const factory = require('./core/injectionRequestFactory');
-const { Attachment, BasicMessage, BulkMessage, BulkRecipient, CustomHeader, EmailAddress, MergeData } = require('./message/messageClasses');
+const { Attachment, BasicMessage, BulkMessage, BulkRecipient, CustomHeader, EmailAddress, MergeData, Metadata } = require('./message/messageClasses');
 const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
 const retryHandler = require('./core/retryHandler');
@@ -148,6 +148,8 @@ class SocketLabsClient {
      * @param {string} [messageData.mailingId] - the custom MailingId for the message.
      * @param {string} [messageData.charSet] - the optional character set for your message.
      * @param {customHeaders[]} [messageData.customHeaders] - the optional list of custom message headers added to the message.
+     * @param {metadata[]} [messageData.metadata] - the optional list of metadata added to the message.
+     * @param {string[]} [messageData.tags] - the optional list of tags added to the message.
      * @param {mergeData[]} [messageData.globalMergeData] - the optional list of mergeData items that will be global across the whole message. (bulk send only)
      * @param {string} messageData.messageType - type of message being sent
      * @returns {sendResponse} - SendResponse promise
@@ -206,5 +208,6 @@ module.exports = {
     BulkRecipient,
     CustomHeader,
     EmailAddress,
-    MergeData
+    MergeData,
+    Metadata
 };

@@ -4,6 +4,7 @@ const ToBulkRecipient = require('./toBulkRecipient');
 const ToCustomHeader = require('./toCustomHeader');
 const ToEmailAddress = require('./toEmailAddress');
 const ToMergeData = require('./toMergeData');
+const ToMetadata = require('./toMetadata');
 
 module.exports = {
     ToAddressResult,
@@ -11,5 +12,6 @@ module.exports = {
     ToBulkRecipient,
     ToCustomHeader,
     ToEmailAddress,
-    ToMergeData
+    ToMergeData,
+    ToMetadata
 }
