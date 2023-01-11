@@ -94,6 +94,14 @@ class SendValidator {
             }
         }
 
+        // Check metadata
+        if (typeof message.metadata !== 'undefined' || message.metadata) {
+            if (!this.hasValidMetadata(message.metadata)) {
+                result.setResult(sendResultEnum.MessageValidationInvalidMetadata);
+                return result;
+            }
+        }
+
         // Check email addresses
         return this.validateEmailAddresses(message.to, message.cc, message.bcc);
 
@@ -141,6 +149,14 @@ class SendValidator {
         if (typeof message.customHeaders !== 'undefined' || message.customHeaders) {
             if (!this.hasValidCustomHeaders(message.customHeaders)) {
                 result.setResult(sendResultEnum.MessageValidationInvalidCustomHeaders);
+                return result;
+            }
+        }
+
+        // Check metadata
+        if (typeof message.metadata !== 'undefined' || message.metadata) {
+            if (!this.hasValidMetadata(message.metadata)) {
+                result.setResult(sendResultEnum.MessageValidationInvalidMetadata);
                 return result;
             }
         }
@@ -237,6 +253,35 @@ class SendValidator {
             try {
                 value.forEach(element => {
                     if (!ToCustomHeader.convert(element).isValid())
+                        return false;
+                });
+            } catch (error) {
+                return false;
+            } finally {
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Check if metadata in the array are valid
+     * @param  {metadata[]} value - array of metadata
+     * @returns {bool} the validation result
+     */
+    hasValidMetadata(value) {
+        if (typeof value === 'undefined' || !value) {
+            return true;
+        }
+        if (!Array.isArray(value)) {
+            return false;
+        }
+        if (value.length == 0) {
+            return true;
+        }
+        if (value.length > 0) {
+            try {
+                value.forEach(element => {
+                    if (!ToMetadata.convert(element).isValid())
                         return false;
                 });
             } catch (error) {
