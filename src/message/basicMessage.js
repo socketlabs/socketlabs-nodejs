@@ -555,7 +555,7 @@ class BasicMessage {
             this.metadata.forEach(element => {
                 _md.push(toMetadata.convert(element).toJSON());
             });
-            json.meta = _md;
+            json.metadata = _md;
         }
 
         if (this.tags.length > 0) {
