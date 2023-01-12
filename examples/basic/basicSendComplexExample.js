@@ -124,30 +124,30 @@ message.addCustomHeaders("testMessageHeader", "I am a message header");
 /**
  * Adding Metadata
  */
-// Add Custom Headers using an Array
+// Add Metadata using an Array
 var metadata = [];
 metadata.push(new Metadata("example-type", "basic-send-complex"));
 metadata.push({ name: "message-contains", value: "attachments, headers" });
 message.metadata = metadata;
 
-// Add Custom Headers directly to the Array
+// Add Metadata directly to the Array
 message.metadata.push(new Metadata("message-has-attachments", "true"));
 
-// Add Custom Headers using the addCustomHeaders function
+// Add Metadata using the addCustomHeaders function
 message.addMetadata("testMessageHeader", "I am metadata");
 
 /**
  * Adding Tags
  */
-// Add Custom Headers using an Array
+// Add Tags using an Array
 var tags = [];
-tags.push("basic-send-complex");
+tags.push("example-type:basic-send-complex");
 message.tags = tags;
 
-// Add Custom Headers directly to the Array
+// Add Tags directly to the Array
 message.tags.push("has-attachments:true");
 
-// Add Custom Headers using the addCustomHeaders function
+// Add Tags using the addCustomHeaders function
 message.addTag("I am a test message");
 
 
