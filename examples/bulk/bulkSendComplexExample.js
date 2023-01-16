@@ -189,6 +189,7 @@ message.tags.push("has-attachments:true");
 
 // Add Tags using the addCustomHeaders function
 message.addTag("I am a test message");
+message.addTag("nodejs-Example");
 
 /**
  * Create the client

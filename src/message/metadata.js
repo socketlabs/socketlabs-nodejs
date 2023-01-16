@@ -1,44 +1,44 @@
 'use strict';
 
 /**
- * Represents Metadata as a name and value pair.
+ * Represents Metadata as a key and value pair.
  * @example
  * var metadata = require('./metadata');
  * ...
  *
- * var header1 = new metadata("name1", "value1");
+ * var metadata1 = new metadata("key1", "value1");
  */
 class Metadata {
 
     /**
      * Creates a new instance of the Metadata class.
      * @constructor
-     * @param {string} name, The name of your custom header.
+     * @param {string} key, The key of your custom header.
      * @param {string} value, The value of your custom header.
      * @example
-     * var header1 = Metadata("name1", "value1");
+     * var metadata1 = Metadata("key1", "value1");
      *
      */
-    constructor(name, value) {
-        this.setName(name);
+    constructor(key, value) {
+        this.setKey(key);
         this.setValue(value);
     }
 
     /**
-     * Sets the Metadata Name.
+     * Sets the Metadata Key.
      * @param  {string} value
      */
-    setName(value) {
+    setKey(value) {
         if (typeof value === 'undefined' || !value) {
             return;
         }
         if (typeof value !== 'string') {
-            throw new Error("Invalid custom header name, type of 'string' was expected.");
+            throw new Error("Invalid metadata, type of 'string' was expected.");
         }
         /**
-         * The Metadata Name.
+         * The Metadata Key.
          */
-        this.name = value;
+        this.key = value;
     }
 
     /**
@@ -62,7 +62,7 @@ class Metadata {
      * A quick check to ensure that the Metadata is valid.
      */
     isValid() {
-        if ((!this.name && this.name !== "") && (!this.value && this.value !== ""))
+        if ((!this.key && this.key !== "") && (!this.value && this.value !== ""))
             return false;
         return true;
     }
@@ -70,7 +70,7 @@ class Metadata {
      * String representation of the Metadata class.
      */
     toString() {
-        return `${this.name}, ${this.value}`;
+        return `${this.key}, ${this.value}`;
     }
     /**
      * JSON string representation of the Metadata class.
@@ -78,7 +78,7 @@ class Metadata {
     toJSON() {
 
         return {
-            name: this.name,
+            key: this.key,
             value: this.value
         };
 

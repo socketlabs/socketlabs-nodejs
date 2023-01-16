@@ -21,8 +21,8 @@ class ToMetadata {
         }
         else if (typeof value === 'object') {
             var n, v;
-            if ('name' in value) {
-                n = value.name;
+            if ('key' in value) {
+                n = value.key;
             }
             if ('value' in value) {
                 v = value.value;
