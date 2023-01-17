@@ -5,18 +5,20 @@ const bulkRecipient = require('./bulkRecipient');
 const attachment = require('./attachment');
 const customHeader = require('./customHeader');
 const mergeData = require('./mergeData');
+const metadata = require('./metadata');
 
 const toBulkRecipient = require('../helpers/toBulkRecipient');
 const toEmailAddress = require('../helpers/toEmailAddress');
 const toCustomHeader = require('../helpers/toCustomHeader');
 const toMergeData = require('../helpers/toMergeData');
 const toAttachment = require('../helpers/toAttachment');
+const toMetadata = require('../helpers/toMetadata');
 
 /**
- * A bulk message usually contains a single recipient per message 
- * and is generally used to send the same content to many recipients, 
+ * A bulk message usually contains a single recipient per message
+ * and is generally used to send the same content to many recipients,
  * optionally customizing the message via the use of MergeData.
- * 
+ *
  * @example
  * Example:
  * var bulkMessage = require('./bulkMessage');
@@ -24,36 +26,36 @@ const toAttachment = require('../helpers/toAttachment');
  * var bulkRecipient = require('./bulkRecipient');
  * var mergeData = require('./mergeData');
  * ...
- * 
+ *
  * var message = new bulkMessage();
- * 
+ *
  * message.subject = "Sending A Message";
  * message.htmlBody = "<html>This is the HtmlBody of my message sent to ##Name##</html>";
  * message.textBody = "This is the body of my message sent to ##Name##";
- * 
+ *
  * message.from = new emailAddress("from@example.com");
  * message.replyTo = new emailAddress("replyto@example.com");
- * 
+ *
  * var rec1MergeData = [];
  * rec1MergeData.push(new mergeData("Name", "recipient1"));
  * message.to.push(new bulkRecipient("recipient1@example.com"));
- * 
+ *
  * var rec2MergeData = [];
  * rec2MergeData.push({ key: "Name", value: "recipient2" });
  * message.to.push(new bulkRecipient("recipient2@example.com", { friendlyName: "Recipient #2" }));
-  * 
+  *
  * message.addToEmailAddress("recipient3@example.com");
  * message.addToEmailAddress("recipient4@example.com", "Recipient #4");
- * 
+ *
  * message.GlobalMergeData.push(new MergeData("Name", "value1"));
- * 
+ *
  */
-class BulkMessage{
+class BulkMessage {
 
     /**
      * Initializes a new instance of the BasicMessage class
      */
-    constructor() {        
+    constructor() {
         /**
          * The list of To recipients.
          */
@@ -73,11 +75,21 @@ class BulkMessage{
          * The list of global merge data.
          */
         this.globalMergeData = [];
-           
+
         /**
          * The type of message.
          */
         this.messageType = "bulk";
+
+        /**
+         * The list of metadata.
+         */
+        this.metadata = [];
+
+        /**
+         * The list of tags.
+         */
+        this.tags = [];
     }
 
     /**
@@ -86,10 +98,10 @@ class BulkMessage{
      */
     setSubject(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid subject, type of 'string' was expected.");
+            throw new Error("Invalid subject, type of 'string' was expected.");
         }
         /**
          * The message Subject
@@ -98,37 +110,37 @@ class BulkMessage{
     }
 
     /**
-     * Sets the plain text portion of the message body. 
+     * Sets the plain text portion of the message body.
      * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate
      * @param  {string} value
      */
     setTextBody(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid Plain Text Body, type of 'string' was expected.");
+            throw new Error("Invalid Plain Text Body, type of 'string' was expected.");
         }
         /**
-         * The plain text portion of the message body. 
+         * The plain text portion of the message body.
          */
         this.textBody = value;
     }
-    
+
     /**
-     * Sets the HTML portion of the message body. 
+     * Sets the HTML portion of the message body.
      * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate
      * @param  {string} value
      */
     setHtmlBody(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid HTML Body, type of 'string' was expected.");
+            throw new Error("Invalid HTML Body, type of 'string' was expected.");
         }
         /**
-         * The HTML portion of the message body. 
+         * The HTML portion of the message body.
          */
         this.htmlBody = value;
     }
@@ -140,10 +152,10 @@ class BulkMessage{
      */
     setApiTemplate(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (!Number.isInteger(value)) {
-          throw new Error("Invalid Api Template, type of 'Integer' was expected.");
+            throw new Error("Invalid Api Template, type of 'Integer' was expected.");
         }
         /**
          * The Api Template for the message.
@@ -158,10 +170,10 @@ class BulkMessage{
      */
     setAmpBody(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid ampBody, type of 'string' was expected.");
+            throw new Error("Invalid ampBody, type of 'string' was expected.");
         }
         /**
          * The Api Template for the message.
@@ -176,10 +188,10 @@ class BulkMessage{
      */
     setMailingId(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid Mailing Id, type of 'string' was expected.");
+            throw new Error("Invalid Mailing Id, type of 'string' was expected.");
         }
         /**
          * The custom MailingId for the message.
@@ -194,10 +206,10 @@ class BulkMessage{
      */
     setMessageId(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid Message Id, type of 'string' was expected.");
+            throw new Error("Invalid Message Id, type of 'string' was expected.");
         }
         /**
          * The custom MessageId for the message.
@@ -260,10 +272,10 @@ class BulkMessage{
      */
     setCharSet(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid character set, type of 'string' was expected.");
+            throw new Error("Invalid character set, type of 'string' was expected.");
         }
         /**
          * The character set for your message.
@@ -271,24 +283,24 @@ class BulkMessage{
         this.charSet = value;
     }
 
-    
+
     /**
      * Sets the list of To recipients, an array of BulkRecipient items
      * @param  {Array} value
      */
-    setTo(value) {  
+    setTo(value) {
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.to.push(toBulkRecipient.convert(element));
-            });            
+            });
         }
         else {
             this.to.push(toBulkRecipient.convert(value));
         }
-    } 
+    }
     /**
      * Add a new EmailAddress to the array of To recipients
      * @param  {string} value
@@ -305,18 +317,18 @@ class BulkMessage{
      */
     setAttachments(value) {
         this.addAttachments(value);
-    } 
+    }
     /**
      * Add an EmailAddress to the array of BCC recipients
      * @param  {Attachment} value
      */
     addAttachments(value) {
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 if (element.constructor === attachment) {
                     this.attachments.push(element);
                 }
-            });            
+            });
         }
         else if (value.constructor === attachment) {
             this.attachments.push(value);
@@ -326,7 +338,7 @@ class BulkMessage{
         }
     }
 
-    
+
     /**
      * Sets the list of custom headers, an array of CustomHeader items
      * @param  {CustomHeader} value
@@ -335,15 +347,15 @@ class BulkMessage{
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.customHeaders.push(toCustomHeader.convert(element));
-            });            
+            });
         }
         else {
             this.customHeaders.push(toCustomHeader.convert(value));
         }
-    } 
+    }
     /**
      * Add a CustomHeader to the message
      * @param  {string} name
@@ -361,15 +373,15 @@ class BulkMessage{
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.globalMergeData.push(toMergeData.convert(element));
-            });            
+            });
         }
         else {
             this.globalMergeData.push(toMergeData.convert(value));
         }
-    } 
+    }
     /**
      * Add a MergeData to the array of GlobalMergeData
      * @param  {string} key
@@ -379,7 +391,57 @@ class BulkMessage{
         this.globalMergeData.push(new mergeData(key, value));
     }
 
-    
+    /**
+     * Sets the list of metadata, an array of Metadata items
+     * @param  {Metadata} value
+     */
+    setMetadata(value) {
+        if (typeof value === 'undefined' || !value) {
+            return;
+        }
+        if (value && Array.isArray(value)) {
+            value.forEach(element => {
+                this.metadata.push(toMetadata.convert(element));
+            });
+        }
+        else {
+            this.metadata.push(toMetadata.convert(value));
+        }
+    }
+    /**
+     * Add a Metadata to the message
+     * @param  {string} key
+     * @param  {string} value
+     */
+    addMetadata(name, value) {
+        this.metadata.push(new metadata(name, value));
+    }
+
+    /**
+     * Sets the list of tags, an array of tags
+     * @param  {Metadata} value
+     */
+    setTags(value) {
+        if (typeof value === 'undefined' || !value) {
+            return;
+        }
+        if (value && Array.isArray(value)) {
+            value.forEach(element => {
+                this.tags.push(element);
+            });
+        }
+        else {
+            this.tags.push(value);
+        }
+    }
+    /**
+     * Add a Tag to the message
+     * @param  {string} value
+     */
+    addTag(value) {
+        this.tags.push(value);
+    }
+
     /**
      * String representation of the CustomHeader class.
      * @returns {string}
@@ -391,13 +453,13 @@ class BulkMessage{
      * JSON string representation of the CustomHeader class.
      */
     toJSON() {
-        
+
         var json = {};
 
         if (this.subject) {
             json.subject = this.subject;
         }
-        
+
         if (this.htmlBody) {
             json.htmlBody = this.htmlBody;
         }
@@ -421,7 +483,7 @@ class BulkMessage{
         if (this.messageId) {
             json.messageId = this.messageId;
         }
-        
+
         json.from = toEmailAddress.convert(this.from).toJSON();
 
         if (this.replyTo) {
@@ -434,61 +496,77 @@ class BulkMessage{
 
         if (this.customHeaders.length > 0) {
             var _ch = [];
-            this.customHeaders.forEach(element => { 
-                _ch.push(toCustomHeader.convert(element).toJSON()); 
+            this.customHeaders.forEach(element => {
+                _ch.push(toCustomHeader.convert(element).toJSON());
             });
-            json.customHeaders = _ch;            
+            json.customHeaders = _ch;
         }
 
-        if (this.attachments.length > 0) {  
+        if (this.attachments.length > 0) {
             var _at = [];
-            this.attachments.forEach(element => { 
-                _at.push(toAttachment.convert(element).toJSON()); 
+            this.attachments.forEach(element => {
+                _at.push(toAttachment.convert(element).toJSON());
             });
             json.attachments = _at;
         }
-        
+
         if (this.to.length > 0) {
 
-            if (!json.mergeData) 
+            if (!json.mergeData)
                 json.mergeData = {};
 
-            json.to = [ { emailAddress: "%%DeliveryAddress%%", friendlyName: "%%RecipientName%%" } ];
-                        
+            json.to = [{ emailAddress: "%%DeliveryAddress%%", friendlyName: "%%RecipientName%%" }];
+
             var _pm = [];
             if (this.to.length > 0) {
-                this.to.forEach(element => {                
+                this.to.forEach(element => {
                     _pm.push(toBulkRecipient.convert(element).toJSON());
-                });                
+                });
             }
             json.mergeData.PerMessage = _pm;
         }
 
         if (this.globalMergeData.length > 0) {
-            
-            if (!json.mergeData) 
-                json.mergeData = {};      
+
+            if (!json.mergeData)
+                json.mergeData = {};
 
             var _gd = [];
             if (this.globalMergeData.length > 0) {
                 var keys = this.globalMergeData.map((mdata) => mdata.key.toLowerCase());
                 var duplicateKeys = keys.reduce((acc, curr, i, arr) => {
-                    if(arr.indexOf(curr) !== i && acc.indexOf(curr) < 0){
+                    if (arr.indexOf(curr) !== i && acc.indexOf(curr) < 0) {
                         acc.push(curr);
                     }
                     return acc;
                 }, []);
-                if(duplicateKeys.length > 0) {
+                if (duplicateKeys.length > 0) {
                     throw new Error(`Invalid global merge data, merge data items contained duplicate keys: ${duplicateKeys}.`);
                 }
-            
-                this.globalMergeData.forEach(element => {                
+
+                this.globalMergeData.forEach(element => {
                     _gd.push(toMergeData.convert(element).toJSON());
                 });
             }
             json.mergeData.Global = _gd;
         }
-        
+
+        if (this.metadata.length > 0) {
+            var _md = [];
+            this.metadata.forEach(element => {
+                _md.push(toMetadata.convert(element).toJSON());
+            });
+            json.metadata = _md;
+        }
+
+        if (this.tags.length > 0) {
+            var _t = [];
+            this.tags.forEach(element => {
+                _t.push(element);
+            });
+            json.tags = _t;
+        }
+
         return json;
     }
 

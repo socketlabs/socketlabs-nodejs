@@ -3,44 +3,46 @@
 const emailAddress = require('./emailAddress');
 const attachment = require('./attachment');
 const customHeader = require('./customHeader');
+const metadata = require('./metadata');
 
 const toEmailAddress = require('../helpers/toEmailAddress');
 const toCustomHeader = require('../helpers/toCustomHeader');
 const toAttachment = require('../helpers/toAttachment');
+const toMetadata = require('../helpers/toMetadata');
 
 /**
  * A basic email message similar to one created in a personal email client such as Outlook.
  * This message can have many recipients of different types, such as To, CC, and BCC.  This
  * message does not support merge fields.
- * 
+ *
  * @example
  * Example:
  * var basicMessage = require('./basicMessage');
  * var emailAddress = require('./emailAddress');
  * ...
- * 
+ *
  * var message = new basicMessage();
- * 
+ *
  * message.subject = "Sending A Message";
  * message.htmlBody = "<html>This is the Html Body of my message.</html>";
  * message.textBody = "This is the Plain Text Body of my message.";
- * 
+ *
  * message.from = new emailAddress("from@example.com");
  * message.replyTo = new emailAddress("replyto@example.com");
- * 
+ *
  * message.to.push(new emailAddress("recipient1@example.com"));
  * message.to.push(new emailAddress("recipient2@example.com", { friendlyName: "Recipient #2" }));
-  * 
+  *
  * message.addToEmailAddress("recipient3@example.com");
  * message.addToEmailAddress("recipient4@example.com", "Recipient #4");
- * 
+ *
  */
-class BasicMessage{
+class BasicMessage {
 
     /**
      * Initializes a new instance of the BasicMessage class
      */
-    constructor() {        
+    constructor() {
         /**
          * The list of To recipients.
          */
@@ -65,11 +67,21 @@ class BasicMessage{
          * The list of attachments.
          */
         this.attachments = [];
-                
+
         /**
          * The type of message.
          */
         this.messageType = "basic";
+
+        /**
+         * The list of metadata.
+         */
+        this.metadata = [];
+
+        /**
+         * The list of tags.
+         */
+        this.tags = [];
     }
 
     /**
@@ -78,10 +90,10 @@ class BasicMessage{
      */
     setSubject(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid subject, type of 'string' was expected.");
+            throw new Error("Invalid subject, type of 'string' was expected.");
         }
         /**
          * The message Subject
@@ -90,37 +102,37 @@ class BasicMessage{
     }
 
     /**
-     * Sets the plain text portion of the message body. 
+     * Sets the plain text portion of the message body.
      * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate"
      * @param  {string} value
      */
     setTextBody(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid Plain Text Body, type of 'string' was expected.");
+            throw new Error("Invalid Plain Text Body, type of 'string' was expected.");
         }
         /**
-         * The plain text portion of the message body. 
+         * The plain text portion of the message body.
          */
         this.textBody = value;
     }
-    
+
     /**
-     * Sets the HTML portion of the message body. 
+     * Sets the HTML portion of the message body.
      * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate"
      * @param  {string} value
      */
     setHtmlBody(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid HTML Body, type of 'string' was expected.");
+            throw new Error("Invalid HTML Body, type of 'string' was expected.");
         }
         /**
-         * The HTML portion of the message body. 
+         * The HTML portion of the message body.
          */
         this.htmlBody = value;
     }
@@ -132,10 +144,10 @@ class BasicMessage{
      */
     setApiTemplate(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (!Number.isInteger(value)) {
-          throw new Error("Invalid Api Template, type of 'Integer' was expected.");
+            throw new Error("Invalid Api Template, type of 'Integer' was expected.");
         }
         /**
          * The Api Template for the message.
@@ -143,18 +155,18 @@ class BasicMessage{
         this.apiTemplate = value;
     }
 
-     /**
-     * Sets the ampBody for the message.
-     * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate"
-     * @param  {int} value
-     */
+    /**
+    * Sets the ampBody for the message.
+    * (Optional) Either TextBody or HtmlBody must be used with the AmpBody or use a ApiTemplate"
+    * @param  {int} value
+    */
     setAmpBody(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
             throw new Error("Invalid Amp Body, type of 'string' was expected.");
-            }
+        }
         /**
          * The Api Template for the message.
          */
@@ -167,10 +179,10 @@ class BasicMessage{
      */
     setMailingId(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid Mailing Id, type of 'string' was expected.");
+            throw new Error("Invalid Mailing Id, type of 'string' was expected.");
         }
         /**
          * The custom MailingId for the message.
@@ -185,10 +197,10 @@ class BasicMessage{
      */
     setMessageId(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid Message Id, type of 'string' was expected.");
+            throw new Error("Invalid Message Id, type of 'string' was expected.");
         }
         /**
          * The custom MessageId for the message.
@@ -251,10 +263,10 @@ class BasicMessage{
      */
     setCharSet(value) {
         if (typeof value === 'undefined' || !value) {
-          return;
+            return;
         }
         if (typeof value !== 'string') {
-          throw new Error("Invalid character set, type of 'string' was expected.");
+            throw new Error("Invalid character set, type of 'string' was expected.");
         }
         /**
          * The character set for your message.
@@ -266,19 +278,19 @@ class BasicMessage{
      * Sets the list of To recipients, an array of EmailAddress items
      * @param  {Array} value
      */
-    setTo(value) {      
+    setTo(value) {
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.to.push(toEmailAddress.convert(element));
-            });            
+            });
         }
         else {
             this.to.push(toEmailAddress.convert(value));
         }
-    } 
+    }
     /**
      * Add a new emailAddress to the array of To recipients
      * @param  {string} value
@@ -296,15 +308,15 @@ class BasicMessage{
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.cc.push(toEmailAddress.convert(element));
-            });            
+            });
         }
         else {
             this.cc.push(toEmailAddress.convert(value));
         }
-    } 
+    }
     /**
      * Add an EmailAddress to the array of CC recipients
      * @param  {string} value
@@ -322,15 +334,15 @@ class BasicMessage{
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.bcc.push(toEmailAddress.convert(element));
-            });            
+            });
         }
         else {
             this.bcc.push(toEmailAddress.convert(value));
         }
-    } 
+    }
     /**
      * Add an EmailAddress to the array of BCC recipients
      * @param  {string} value
@@ -346,18 +358,18 @@ class BasicMessage{
      */
     setAttachments(value) {
         this.addAttachments(value);
-    } 
+    }
     /**
      * Add an EmailAddress to the array of Attachment items
      * @param  {Attachment} value
      */
     addAttachments(value) {
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 if (element.constructor === attachment) {
                     this.attachments.push(element);
                 }
-            });            
+            });
         }
         else if (value.constructor === attachment) {
             this.attachments.push(value);
@@ -375,15 +387,15 @@ class BasicMessage{
         if (typeof value === 'undefined' || !value) {
             return;
         }
-        if(value && Array.isArray(value)) {
+        if (value && Array.isArray(value)) {
             value.forEach(element => {
                 this.customHeaders.push(toCustomHeader.convert(element));
-            });            
+            });
         }
         else {
             this.customHeaders.push(toCustomHeader.convert(value));
         }
-    } 
+    }
     /**
      * Add a CustomHeader to the message
      * @param  {string} name
@@ -394,7 +406,58 @@ class BasicMessage{
     }
 
     /**
-     * String representation of the CustomHeader class.
+     * Sets the list of metadata, an array of Metadata items
+     * @param  {Metadata} value
+     */
+    setMetadata(value) {
+        if (typeof value === 'undefined' || !value) {
+            return;
+        }
+        if (value && Array.isArray(value)) {
+            value.forEach(element => {
+                this.metadata.push(toMetadata.convert(element));
+            });
+        }
+        else {
+            this.metadata.push(toMetadata.convert(value));
+        }
+    }
+    /**
+     * Add a Metadata to the message
+     * @param  {string} key
+     * @param  {string} value
+     */
+    addMetadata(name, value) {
+        this.metadata.push(new metadata(name, value));
+    }
+
+    /**
+     * Sets the list of tags, an array of tags
+     * @param  {Metadata} value
+     */
+    setTags(value) {
+        if (typeof value === 'undefined' || !value) {
+            return;
+        }
+        if (value && Array.isArray(value)) {
+            value.forEach(element => {
+                this.tags.push(element);
+            });
+        }
+        else {
+            this.tags.push(value);
+        }
+    }
+    /**
+     * Add a Tag to the message
+     * @param  {string} value
+     */
+    addTag(value) {
+        this.tags.push(value);
+    }
+
+    /**
+     * String representation of the BasicMessage class.
      * @returns {string}
      */
     toString() {
@@ -402,17 +465,17 @@ class BasicMessage{
     }
 
     /**
-     * JSON string representation of the CustomHeader class.
+     * JSON string representation of the BasicMessage class.
      * @returns {object}
      */
-    toJSON() {        
+    toJSON() {
 
         var json = {};
 
         if (this.subject) {
             json.subject = this.subject;
         }
-        
+
         if (this.htmlBody) {
             json.htmlBody = this.htmlBody;
         }
@@ -436,7 +499,7 @@ class BasicMessage{
         if (this.messageId) {
             json.messageId = this.messageId;
         }
-        
+
         json.from = toEmailAddress.convert(this.from).toJSON();
 
         if (this.replyTo) {
@@ -449,44 +512,60 @@ class BasicMessage{
 
         if (this.to.length > 0) {
             var _to = [];
-            this.to.forEach(element => { 
-                _to.push(toEmailAddress.convert(element).toJSON()); 
+            this.to.forEach(element => {
+                _to.push(toEmailAddress.convert(element).toJSON());
             });
             json.to = _to;
         }
 
         if (this.cc.length > 0) {
             var _cc = [];
-            this.cc.forEach(element => { 
-                _cc.push(toEmailAddress.convert(element).toJSON()); 
+            this.cc.forEach(element => {
+                _cc.push(toEmailAddress.convert(element).toJSON());
             });
-            json.cc = _cc; 
+            json.cc = _cc;
         }
 
         if (this.bcc.length > 0) {
             var _bcc = [];
-            this.bcc.forEach(element => { 
-                _bcc.push(toEmailAddress.convert(element).toJSON()); 
+            this.bcc.forEach(element => {
+                _bcc.push(toEmailAddress.convert(element).toJSON());
             });
             json.bcc = _bcc;
         }
 
         if (this.customHeaders.length > 0) {
             var _ch = [];
-            this.customHeaders.forEach(element => { 
-                _ch.push(toCustomHeader.convert(element).toJSON()); 
+            this.customHeaders.forEach(element => {
+                _ch.push(toCustomHeader.convert(element).toJSON());
             });
-            json.customHeaders = _ch;            
+            json.customHeaders = _ch;
         }
 
-        if (this.attachments.length > 0) {  
+        if (this.attachments.length > 0) {
             var _at = [];
-            this.attachments.forEach(element => { 
-                _at.push(toAttachment.convert(element).toJSON()); 
+            this.attachments.forEach(element => {
+                _at.push(toAttachment.convert(element).toJSON());
             });
             json.attachments = _at;
         }
-        
+
+        if (this.metadata.length > 0) {
+            var _md = [];
+            this.metadata.forEach(element => {
+                _md.push(toMetadata.convert(element).toJSON());
+            });
+            json.metadata = _md;
+        }
+
+        if (this.tags.length > 0) {
+            var _t = [];
+            this.tags.forEach(element => {
+                _t.push(element);
+            });
+            json.tags = _t;
+        }
+
         return json;
     }
 }

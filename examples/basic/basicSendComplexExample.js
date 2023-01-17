@@ -1,4 +1,4 @@
-const { SocketLabsClient, EmailAddress, BasicMessage, Attachment, CustomHeader } = require('../../src/socketlabsClient');
+const { SocketLabsClient, EmailAddress, BasicMessage, Attachment, CustomHeader, Metadata } = require('../../src/socketlabsClient');
 const exampleConfig = require('../exampleConfig');
 const resolve = require('path').resolve;
 
@@ -104,7 +104,7 @@ var attachment2 = new Attachment({
 message.addAttachments(attachment2)
 
 // Add Attachment a filePath {string} to the array
-message.attachments.push(resolve("./html/sampleemail.html"));
+message.attachments.push(resolve("./../html/SampleEmail.html"));
 
 /**
  * Adding Custom Headers
@@ -120,6 +120,37 @@ message.customHeaders.push(new CustomHeader("message-has-attachments", "true"));
 
 // Add Custom Headers using the addCustomHeaders function
 message.addCustomHeaders("testMessageHeader", "I am a message header");
+
+/**
+ * Adding Metadata
+ */
+// Add Metadata using an Array
+var metadata = [];
+metadata.push(new Metadata("example-type", "basic-send-complex"));
+metadata.push({ name: "message-contains", value: "attachments, headers" });
+message.metadata = metadata;
+
+// Add Metadata directly to the Array
+message.metadata.push(new Metadata("message-has-attachments", "true"));
+
+// Add Metadata using the addCustomHeaders function
+message.addMetadata("testMessageHeader", "I am metadata");
+
+/**
+ * Adding Tags
+ */
+// Add Tags using an Array
+var tags = [];
+tags.push("example-type:basic-send-complex");
+message.tags = tags;
+
+// Add Tags directly to the Array
+message.tags.push("has-attachments:true");
+
+// Add Tags using the addCustomHeaders function
+message.addTag("I am a test message");
+message.addTag("nodejs-Example");
+
 
 /**
  * Create the client

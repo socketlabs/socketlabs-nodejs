@@ -5,6 +5,7 @@ const BulkRecipient = require('./bulkRecipient');
 const CustomHeader = require('./customHeader');
 const EmailAddress = require('./emailAddress');
 const MergeData = require('./mergeData');
+const Metadata = require('./metadata');
 
 module.exports = {
     Attachment,
@@ -13,5 +14,6 @@ module.exports = {
     BulkRecipient,
     CustomHeader,
     EmailAddress,
-    MergeData
+    MergeData,
+    Metadata,
 }
