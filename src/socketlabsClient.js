@@ -8,6 +8,8 @@ const { Attachment, BasicMessage, BulkMessage, BulkRecipient, CustomHeader, Emai
 const sendResultEnum = require('./sendResultEnum');
 const sendResponse = require('./sendResponse');
 const retryHandler = require('./core/retryHandler');
+const apiKeyParser = require('./core/apiKeyParser');
+const apiKeyParseResult = require('./apiKeyParseResult');
 
 /**
  * SocketLabsClient is a wrapper for the SocketLabs Injection API that makes
@@ -99,18 +101,41 @@ class SocketLabsClient {
 
     createRequest(requestJson) {
 
-        let request = {
-            url: this.endpointUrl,
-            method: "POST",
-            data: {
-                apiKey: this.apiKey,
-                serverId: this.serverId,
-                messages: [requestJson],
-            },
-            headers: { 'User-Agent': this.userAgent },
-            timeout: this.requestTimeout * 1000,
+        var request;
 
-        };
+        let parser = new apiKeyParser
+
+        if (parser.parseApiKey(this.apiKey) === apiKeyParseResult.Success)
+        {
+            console.log("Got in here");
+            request = {
+                url: this.endpointUrl,
+                method: "POST",
+                data: {
+                    serverId: this.serverId,
+                    messages: [requestJson],
+                },
+                headers: { 
+                            'User-Agent': this.userAgent,
+                            'Authorization': 'Bearer ' + this.apiKey
+                         },
+                timeout: this.requestTimeout * 1000,
+    
+            };
+        } else {
+            request = {
+                url: this.endpointUrl,
+                method: "POST",
+                data: {
+                    apiKey: this.apiKey,
+                    serverId: this.serverId,
+                    messages: [requestJson],
+                },
+                headers: { 'User-Agent': this.userAgent },
+                timeout: this.requestTimeout * 1000,
+    
+            };
+        }
 
         if (this.proxy) {
             let proxyUrl = new URL(this.proxy);

@@ -1,6 +1,6 @@
 {
   "name": "@socketlabs/email",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "SocketLabs Email Delivery node.js client library",
   "main": "./src/socketlabsClient.js",
   "repository": {
@@ -20,7 +20,8 @@
   "contributors": [
     "Matt Reibach <matt@socketlabs.com>",
     "David Schrenker <david.schrenker@socketlabs.com>",
-    "Mirriam Ronoh <mirriam.ronoh@socketlabs.com>"
+    "Mirriam Ronoh <mirriam.ronoh@socketlabs.com>",
+    "Michael Boshuyzen <mike.boshuyzen@socketlabs.com"
   ],
   "license": "MIT",
   "bugs": {
