@@ -107,7 +107,6 @@ class SocketLabsClient {
 
         if (parser.parseApiKey(this.apiKey) === apiKeyParseResult.Success)
         {
-            console.log("Got in here");
             request = {
                 url: this.endpointUrl,
                 method: "POST",
