@@ -1,6 +1,6 @@
 {
   "name": "@socketlabs/email",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "SocketLabs Email Delivery node.js client library",
   "main": "./src/socketlabsClient.js",
   "repository": {
