@@ -1,6 +1,6 @@
 {
   "name": "@socketlabs/email",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "SocketLabs Email Delivery node.js client library",
   "main": "./src/socketlabsClient.js",
   "repository": {
@@ -21,7 +21,7 @@
     "Matt Reibach <matt@socketlabs.com>",
     "David Schrenker <david.schrenker@socketlabs.com>",
     "Mirriam Ronoh <mirriam.ronoh@socketlabs.com>",
-    "Michael Boshuyzen <mike.boshuyzen@socketlabs.com"
+    "Michael Boshuyzen <mike.boshuyzen@socketlabs.com>"
   ],
   "license": "MIT",
   "bugs": {
@@ -31,5 +31,12 @@
   "dependencies": {
     "axios": "^0.21.1",
     "promise-retry": "^2.0.1"
+  },
+  "directories": {
+    "example": "examples"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

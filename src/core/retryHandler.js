@@ -47,7 +47,6 @@ class RetryHandler {
                     maxTimeout: 10000
                 },
                 (retry, number) => {
-                    console.log(`attempt: ${number}`);
                     return axios(request)
                         .then(
                             (response) => { resolve(response); },
