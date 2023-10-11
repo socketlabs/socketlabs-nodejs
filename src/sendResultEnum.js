@@ -356,5 +356,14 @@ module.exports = Object.freeze(
 
         },
 
+        /**
+         * Metadata and tags exceed 12.5KB
+         */
+        MetadataOrTagsAreTooLarge: {
+            name: "MetadataOrTagsAreTooLarge",
+            value: 41,
+            message: "Metadata and tags exceed 12.5KB"
+        }
+
 
     });
